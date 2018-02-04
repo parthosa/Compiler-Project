@@ -1,0 +1,11 @@
+.and. .or. .not. function [int x] =/= _sumOfSquares[int a, int b, int c]
+#computes the sum of squares of a, b and c
+	int p,q,r;
+	function [int s] = _square[int u]
+		s = u*u;
+	end
+	p = _square(a);
+	q = _square(b);
+	r = _square(c);
+	x = p +q + r ;
+end
