@@ -4,7 +4,7 @@
 #include "lexer.h"
 
 
-void printTokens(char *file_name){
+void printTokens(char const *file_name){
 	FILE *fp;
 	fp = fopen(file_name,"r");
 	line = 1;

@@ -1,0 +1,42 @@
+<mainFunction> -> MAIN
+<stmtsAndFunctionDefs> -> INT, REAL, STRING, MATRIX, ID, SQO, IF, READ, PRINT, FUNID, FUNCTION
+<stmtOrFunctionDef> -> INT, REAL, STRING, MATRIX, ID, SQO, IF, READ, PRINT, FUNID, FUNCTION
+<stmtsAndFunctionDefsOrEmpty> -> INT, REAL, STRING, MATRIX, ID, SQO, IF, READ, PRINT, FUNID, FUNCTION, _eps_
+<stmt> -> INT, REAL, STRING, MATRIX, ID, SQO, IF, READ, PRINT, FUNID
+<functionDef> -> FUNCTION
+<declarationStmt> -> INT, REAL, STRING, MATRIX
+<assignmentStmt> -> ID, SQO
+<conditionalStmt> -> IF
+<ioStmt> -> READ, PRINT
+<funcStmt> -> FUNID
+<otherStmts> -> INT, REAL, STRING, MATRIX, ID, SQO, IF, READ, PRINT, FUNID, _eps_
+<funCall> -> FUNID
+<type> -> INT, REAL, STRING, MATRIX
+<idList> -> ID
+<rightHandSideOfId> -> FUNID, OP, ID, NUM, RNUM, SIZE, STR, SQP
+<rightHandSideOfTuple> -> FUNID, SIZE
+<arithmeticExpression> -> OP, ID, NUM, RNUM, SIZE
+<stringExpression> -> ID, STR
+<matrixExpression> -> ID, SQP
+<booleanExpression> -> OP, NOT, ID, NUM, RNUM, SIZE
+<elseStmt> -> ELSE, _eps_
+<stringOp> -> PLUS, _eps_
+<matrixOp> -> PLUS, MINUS, _eps_
+<matrix> -> SQP
+<plusOrMinus> -> PLUS, MINUS
+<numberList> -> NUM
+<moreMatrixNums> -> SEMICOLON, _eps_
+<moreNums> -> COMMA, _eps_
+<term> -> OP, ID, NUM, RNUM, SIZE
+<arithmeticExpressionOps> -> PLUS, MINUS, _eps_
+<factor> -> OP, ID, NUM, RNUM, SIZE
+<termOps> -> MUL, DIV, _eps_
+<mulOrDiv> -> MUL, DIV
+<var> -> ID, NUM, RNUM, SIZE
+<binaryLogicalOp> -> AND, OR
+<relationalOp> -> LT, LE, EQ, GT, GE, NE
+<parameterList> -> INT, REAL, STRING, MATRIX, _eps_
+<remainingList> -> COMMA, _eps_
+<funIdList> -> ID, _eps_
+<matrixElement> -> ID
+<moreIds> -> COMMA, _eps_
