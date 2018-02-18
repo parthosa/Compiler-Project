@@ -4,7 +4,7 @@
 #ifndef LEXER_H_INCLUDED
 #define LEXER_H_INCLUDED
 
-tokenDesc getToken(char **fileBuff,int *state,char **lexemeInit);
+tokenDesc getToken(FILE *fp,char **fileBuff);
 char *getTokenFromId(int id,char * name);
 
 int error_in_lexer;

@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #define MAX_LENGTH 20
+#define BUFF_SIZE 64
 
 typedef struct
 {
