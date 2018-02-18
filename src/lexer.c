@@ -6,86 +6,93 @@
 #include "lexer.h"
 #include "langDef.h"
 
-tokenDesc setTokenValue(int id,char * name){
+tokenDesc setTokenValue(int *state,char * name,int reset){
 	tokenDesc token;
-	token.id=id;
+	token.id=*state;
 	strcpy(token.name,name);
+	if(reset)
+		*state=1;
 	return token;
 }
 
-tokenDesc getToken(FILE *fp){
-	int state=1,offset=0;
+tokenDesc getToken(char **fileBuff,int *state,char **lexemeInit){
+	int offset=0;
 	char ch;
-	char lexeme[MAX_LENGTH];
-	memset(lexeme,0,MAX_LENGTH);
-	while(1){
-		ch=fgetc(fp);
+	char *lexeme;
+	lexeme = (*lexemeInit);
+	// lexeme = (char*)malloc(MAX_LENGTH * sizeof(char));
+	// memset(lexeme,0,MAX_LENGTH);
+	// if(*state==1)
+	while(*(*fileBuff)!='\0'){
+		ch=*(*fileBuff);
+		// printf("%c\n",ch);
 		// printf("%d,%c,%d\n",ch,ch,state );
 		if(ch=='\n'){
-			if(state==1)
+			if((*state)==1)
 				line++;
-			else if(state!=2){ // not for comment lines
-				fseek(fp,-1,SEEK_CUR);
-				return setTokenValue(state,lexeme);
+			else if((*state)!=2){ // not for comment lines
+				(*fileBuff)-=1;
+				return setTokenValue(state,lexeme,1);
 			}
 		}
 		// check for invalid characters
 		if(ch<0){
-			return setTokenValue(state,lexeme);
+			return setTokenValue(state,lexeme,1);
 		}
 
-		switch(state){
+		switch((*state)){
 			case 1:
 				switch(ch){
 					case ' ':
 					case '\t':
-						continue;
+					case '\n':
+						break;
 					case '#':
-						state = 2;
+						(*state) = 2;
 						break;
 					case '[':
-						state = 4;
-						return setTokenValue(state,"[");
+						(*state) = 4;
+						return setTokenValue(state,"[",1);
 					case ']':
-						state = 5;
-						return setTokenValue(state,"]");
+						(*state) = 5;
+						return setTokenValue(state,"]",1);
 					case '(':
-						state = 6;
-						return setTokenValue(state,"(");
+						(*state) = 6;
+						return setTokenValue(state,"(",1);
 					case ')':
-						state = 7;
-						return setTokenValue(state,")");
+						(*state) = 7;
+						return setTokenValue(state,")",1);
 					case ';':
-						state = 8;
-						return setTokenValue(state,";");
+						(*state) = 8;
+						return setTokenValue(state,";",1);
 					case ',':
-						state = 9;
-						return setTokenValue(state,",");
+						(*state) = 9;
+						return setTokenValue(state,",",1);
 					case '+':
-						state = 10;
-						return setTokenValue(state,"+");
+						(*state) = 10;
+						return setTokenValue(state,"+",1);
 					case '-':
-						state = 11;
-						return setTokenValue(state,"-");
+						(*state) = 11;
+						return setTokenValue(state,"-",1);
 					case '*':
-						state = 12;
-						return setTokenValue(state,"*");
+						(*state) = 12;
+						return setTokenValue(state,"*",1);
 					case '/':
-						state = 13;
-						return setTokenValue(state,"/");
+						(*state) = 13;
+						return setTokenValue(state,"/",1);
 					case '@':
-						state = 14;
-						return setTokenValue(state,"@");
+						(*state) = 14;
+						return setTokenValue(state,"@",1);
 					case'<':
-						state=15;
+						(*state)=15;
 						lexeme[offset++] = ch;
 						break;
 					case'>':
-						state=17;
+						(*state)=17;
 						lexeme[offset++] = ch;
 						break;
 				    case '=':
-				    	state = 19;
+				    	(*state) = 19;
 						lexeme[offset++] = ch;
 						break;
 					case '0':
@@ -98,15 +105,15 @@ tokenDesc getToken(FILE *fp){
 					case '7':
 					case '8':
 					case '9':
-						state = 23;
+						(*state) = 23;
 						lexeme[offset++] = ch;
 						break;
 					case '"':
-						state = 27;
+						(*state) = 27;
 						// lexeme[offset++] = ch;
 						break;
 					case '.':
-						state = 30;
+						(*state) = 30;
 						lexeme[offset++] = ch;
 						break;
 					case 'a': case 'A':
@@ -135,75 +142,76 @@ tokenDesc getToken(FILE *fp){
 					case 'x': case 'X':
 					case 'y': case 'Y':
 					case 'z': case 'Z':
-						state = 42;
+						(*state) = 42;
 						lexeme[offset++] = ch;
 						break;
 					case '_':
-						state = 44;
+						(*state) = 44;
 						lexeme[offset++] = ch;
 						break;
 					default:
-						return setTokenValue(1,"ERROR");
+						(*state) = 1;
+						return setTokenValue(state,"ERROR",1);
 				}
 				break;
 			// <,<=,>,>=,==
 			case 2:
 				if(ch!='\n'){
-					state=2;
+					(*state)=2;
 				}else{
-					state=3;
-					fseek(fp,-1,SEEK_CUR);
-					return setTokenValue(state,"COMMENT");
+					(*state)=3;
+					(*fileBuff)-=1;
+					return setTokenValue(state,"COMMENT",1);
 				}
 				break;
 			case 15:
 			case 17:
 			case 19:
 				if(strcmp(lexeme,"=")==0 && ch=='/'){
-					state=21;
+					(*state)=21;
 					lexeme[offset++]=ch;
 				}
 				else {
 					if(ch=='='){
-						state++;
+						(*state)++;
 						lexeme[offset++]=ch;
 					}
 					else{
-						fseek(fp,-1,SEEK_CUR);
+						(*fileBuff)-=1;
 					}
-					return setTokenValue(state,lexeme);
+					return setTokenValue(state,lexeme,1);
 				}
 				break;
 			// =/= 
 			case 21:
 				if(ch=='='){
-					state++;
+					(*state)++;
 					lexeme[offset++]=ch;
-					return setTokenValue(state,lexeme);
+					return setTokenValue(state,lexeme,1);
 				}else{
 					// throw error
 				}
 				break;
 			case 23:
 				if(isdigit(ch)){
-					state = 23;
+					(*state) = 23;
 				}else if(ch=='.'){
-					if(isalpha(fgetc(fp))){
-						fseek(fp,-2,SEEK_CUR);
-						return setTokenValue(state,lexeme);
+					if(isalpha(*(*fileBuff))){
+						(*fileBuff)-=2;
+						return setTokenValue(state,lexeme,1);
 					}else{
-						fseek(fp,-1,SEEK_CUR);
-						state = 24;
+						(*fileBuff)-=1;
+						(*state) = 24;
 					}
 				}else{
-					fseek(fp,-1,SEEK_CUR);
-					return setTokenValue(state,lexeme);
+					(*fileBuff)-=1;
+					return setTokenValue(state,lexeme,1);
 				}
 				lexeme[offset++] = ch;
 				break;
 			case 24:
 				if(isdigit(ch)){
-					state++;
+					(*state)++;
 					lexeme[offset++] = ch;
 				}else{
 					// throw error
@@ -211,9 +219,9 @@ tokenDesc getToken(FILE *fp){
 				break;
 			case 25:
 				if(isdigit(ch)){
-					state++;
+					(*state)++;
 					lexeme[offset++] = ch;
-					return setTokenValue(state,lexeme);
+					return setTokenValue(state,lexeme,1);
 				}else{
 					
 					// throw error
@@ -221,7 +229,7 @@ tokenDesc getToken(FILE *fp){
 				break;
 			case 27:
 				if (ch >= 'a' && ch <= 'z'){
-					state=28;
+					(*state)=28;
 					lexeme[offset++] = ch;
 				}else{
 					// throw err
@@ -229,27 +237,27 @@ tokenDesc getToken(FILE *fp){
 				break;
 			case 28:
 				if (ch >= 'a' && ch <= 'z'){
-					state=28;
+					(*state)=28;
 					lexeme[offset++] = ch;
 				}else if(ch=='"'){
-					state=29;
+					(*state)=29;
 				}
 				else{
 					// throw err
 				}
 				break;
 			case 29:
-				return setTokenValue(state,lexeme);
+				return setTokenValue(state,lexeme,1);
 			case 30:
 				switch(ch){
 					case 'o':
-						state=31;
+						(*state)=31;
 						break;
 					case 'a':
-						state=34;
+						(*state)=34;
 						break;
 					case 'n':
-						state=38;
+						(*state)=38;
 						break;
 					default:
 						// throw err
@@ -259,7 +267,7 @@ tokenDesc getToken(FILE *fp){
 				break;
 			case 31:
 				if(ch=='r')
-					state=32;
+					(*state)=32;
 				else{
 					// throw err
 				}
@@ -267,9 +275,9 @@ tokenDesc getToken(FILE *fp){
 				break;
 			case 32:
 				if(ch=='.'){
-					state=33;
+					(*state)=33;
 					lexeme[offset++] = ch;
-					return setTokenValue(state,lexeme);
+					return setTokenValue(state,lexeme,1);
 				}
 				else{
 					// throw err
@@ -277,7 +285,7 @@ tokenDesc getToken(FILE *fp){
 				break;
 			case 34:
 				if(ch=='n')
-					state=35;
+					(*state)=35;
 				else{
 					// throw err
 				}
@@ -285,7 +293,7 @@ tokenDesc getToken(FILE *fp){
 				break;
 			case 35:
 				if(ch=='d')
-					state=36;
+					(*state)=36;
 				else{
 					// throw err
 				}
@@ -293,9 +301,9 @@ tokenDesc getToken(FILE *fp){
 				break;
 			case 36:
 				if(ch=='.'){
-					state=37;
+					(*state)=37;
 					lexeme[offset++] = ch;
-					return setTokenValue(state,lexeme);
+					return setTokenValue(state,lexeme,1);
 				}
 				else{
 					// throw err
@@ -303,7 +311,7 @@ tokenDesc getToken(FILE *fp){
 				break;
 			case 38:
 				if(ch=='o')
-					state=39;
+					(*state)=39;
 				else{
 					// throw err
 				}
@@ -311,7 +319,7 @@ tokenDesc getToken(FILE *fp){
 				break;
 			case 39:
 				if(ch=='t')
-					state=40;
+					(*state)=40;
 				else{
 					// throw err
 				}
@@ -319,9 +327,9 @@ tokenDesc getToken(FILE *fp){
 				break;
 			case 40:
 				if(ch=='.'){
-					state=41;
+					(*state)=41;
 					lexeme[offset++] = ch;
-					return setTokenValue(state,lexeme);
+					return setTokenValue(state,lexeme,1);
 				}
 				else{
 					// throw err
@@ -329,20 +337,21 @@ tokenDesc getToken(FILE *fp){
 				break;
 			case 42:
 				if(isalpha(ch)){
-					state=42;
+					(*state)=42;
 					lexeme[offset++] = ch;
 				}else if(isdigit(ch)){
-					state=43;
+					(*state)=43;
 					lexeme[offset++] = ch;
-					return setTokenValue(state,lexeme);
+					return setTokenValue(state,lexeme,1);
 				}else{
-					fseek(fp,-1,SEEK_CUR);
-					return setTokenValue(state,lexeme);
+					(*fileBuff)-=1;
+					return setTokenValue(state,lexeme,1);
 				}
 				break;
 			case 44:
+				// printf("1\n");
 				if(isalpha(ch)){
-					state=45;
+					(*state)=45;
 					lexeme[offset++] = ch;
 				}else{
 					// throw err
@@ -350,18 +359,22 @@ tokenDesc getToken(FILE *fp){
 				break;
 			case 45:
 				if(isalpha(ch)||isdigit(ch)){
-					state=45;
+					(*state)=45;
 					lexeme[offset++] = ch;
 				}else{
-					fseek(fp,-1,SEEK_CUR);
-					return setTokenValue(state,lexeme);
+					(*fileBuff)-=1;
+					return setTokenValue(state,lexeme,1);
 				}
 				break;
 			default:
-				return setTokenValue(1,"ERROR");
+				(*state) = 1;
+				return setTokenValue(state,"ERROR",1);
 		}
+		(*fileBuff)++;
 	}
-	return setTokenValue(1,"ERROR");
+	// (*state) = 1;
+	// printf("err\n");
+	return setTokenValue(state,lexeme,0);
 }
 
 
