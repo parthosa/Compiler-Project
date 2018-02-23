@@ -14,11 +14,9 @@
 <funcStmt> ===> <funCall> SEMICOLON 
 <declarationStmt> ===> <type> <idList> SEMICOLON 
 <assignmentStmt> ===> ID ASSIGNOP <rightHandSideOfId> SEMICOLON
-<assignmentStmt> ===> SQO <idList> SQC ASSIGNOP <rightHandSideOfTuple> SEMICOLON
+<assignmentStmt> ===> SQO <idList> SQC ASSIGNOP <rightHandSideOfTuple> SEMICOLON/
 <rightHandSideOfId> ===> <funCall>
 <rightHandSideOfId> ===> <arithmeticExpression>
-<rightHandSideOfId> ===> <stringExpression>
-<rightHandSideOfId> ===> <matrixExpression>
 <rightHandSideOfTuple> ===> <funCall>
 <rightHandSideOfTuple> ===> SIZE ID 
 <conditionalStmt> ===> IF <booleanExpression> <stmt> <otherStmts> <elseStmt> ENDIF
@@ -26,15 +24,7 @@
 <elseStmt> ===> _eps_
 <ioStmt> ===> READ OP ID CL SEMICOLON
 <ioStmt> ===> PRINT OP ID CL SEMICOLON 
-<stringExpression> ===> ID <stringOp>
-<stringExpression> ===> STR <stringOp> 
-<stringOp> ===> PLUS <stringExpression>
-<stringOp> ===> _eps_
-<matrixExpression> ===> ID <matrixOp>
-<matrixExpression> ===> <matrix> <matrixOp>
-<matrixOp> ===> <plusOrMinus> <matrixExpression>
-<matrixOp> ===> _eps_
-<matrix> ===> SQP <numberList> <moreMatrixNums> SQC 
+<matrix> ===> SQO <numberList> <moreMatrixNums> SQC 
 <numberList> ===> NUM <moreNums> 
 <moreNums> ===> COMMA <numberList>
 <moreNums> ===> _eps_
@@ -47,15 +37,14 @@
 <plusOrMinus> ===> MINUS
 <term> ===> <factor> <termOps>
 <termOps> ===> <mulOrDiv> <term>
-<termOps> ===> _eps_
-<term> ===> <factor> 
+<termOps> ===> _eps_ 
 <mulOrDiv> ===> MUL
 <mulOrDiv> ===> DIV 
 <factor> ===> OP <arithmeticExpression> CL
 <factor> ===> <var> 
 <booleanExpression> ===> OP <booleanExpression> CL <binaryLogicalOp> OP <booleanExpression> CL
 <booleanExpression> ===> NOT OP <booleanExpression> CL
-<booleanExpression> ===> <var> <relationalOp> <var> 
+<booleanExpression> ===> <constrainedVars> <relationalOp> <constrainedVars> 
 <binaryLogicalOp> ===> AND
 <binaryLogicalOp> ===> OR 
 <relationalOp> ===> LT
@@ -76,12 +65,17 @@
 <type> ===> REAL
 <type> ===> STRING
 <type> ===> MATRIX 
-<var> ===> ID
+<var> ===> ID <matrixRest>
 <var> ===> NUM
 <var> ===> RNUM
-<var> ===> <matrixElement>
 <var> ===> SIZE ID 
-<matrixElement> ===> ID SQO NUM COMMA NUM SQC 
+<var> ===> STR
+<var> ===> <matrix>
+<constrainedVars> ===> ID
+<constrainedVars> ===> NUM
+<constrainedVars> ===> RNUM
+<matrixRest> ===> SQO NUM COMMA NUM SQC
+<matrixRest> ===> _eps_
 <idList> ===> ID <moreIds> 
 <moreIds> ===> COMMA <idList>
 <moreIds> ===> _eps_
