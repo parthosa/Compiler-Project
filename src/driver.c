@@ -10,22 +10,15 @@ void printTokens(char const *file_name){
 	tokenDesc token;
 	line = 1;
 	char *fileBuff = (char*)malloc(BUFF_SIZE*sizeof(char));
-	memset(fileBuff,'\0',BUFF_SIZE);
 	
 	printf("%20s%20s%20s\n","Token Name","Lexeme","Line");
 
-	while(!feof(fp)){
-		fread(fileBuff,1,BUFF_SIZE,fp);
-		while(*fileBuff!='\0'){
-			token = getToken(fp,&fileBuff);
+	do{
+		token = getToken(fp,&fileBuff);
+		printf("%20s%20s%20d\n",getTokenFromId(token.id,token.name),token.name,line);
+		fileBuff++;
+	}while(token.id!=0);
 
-			if(token.id!=1){
-				printf("%20s%20s%20d\n",getTokenFromId(token.id,token.name),token.name,line);
-			}
-			fileBuff++;
-		}
-	}
-	// fclose(fp);
 }
 
 

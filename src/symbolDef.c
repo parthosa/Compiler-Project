@@ -1,43 +1,49 @@
 #include<stdio.h>
 #include<string.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <ctype.h>
 
 #include "symbolDef.h"
 
-bool isEpsilon(SymbolDef * symbol){
+int isEpsilon(SymbolDef * symbol){
 	if(strcmp(symbol->value,EPSILON)==0)
-		return true;
+		return 1;
 	else
-		return false;
+		return 0;
 }
 
-bool isTerminal(SymbolDef * symbol){
+int isEndSymbol(SymbolDef * symbol){
+	if(strcmp(symbol->value,ENDMARKER)==0)
+		return 1;
+	else
+		return 0;
+}
+
+int isTerminal(SymbolDef * symbol){
 	int i=0;
 	
-	if(isEpsilon(symbol))
-		return true;
+	if(isEpsilon(symbol) || isEndSymbol(symbol))
+		return 1;
 
 	while(symbol->value[i]){
 		if(!isupper(symbol->value[i]))
-			return false;
+			return 0;
 		i++;
 	}
-	return true;
+	return 1;
 }
 
 
-bool hasEpsilon(SymbolList * symbols){
+int hasEpsilon(SymbolList * symbols){
 	SymbolList * temp = symbols;
 	
 	while(temp!=NULL){
 		if(isEpsilon(temp->symbol)){
-			return true;
+			return 1;
 		}
 		temp=temp->next;
 	}
-	return false;
+	return 0;
 }
 
 int allEpsilon(SymbolList * begin,SymbolList * end){
@@ -96,9 +102,9 @@ SymbolDef * insertSymbol(SymbolList ** symbols,SymbolDef *new_symbol){
 	return new_symbol;
 }
 
-SymbolDef *  insertSymbolFromToken(SymbolList ** symbols,char * leftSide){
+SymbolDef * makeSymbol(char * str){
 	SymbolDef* new_symbol = (SymbolDef*) malloc(sizeof(SymbolDef));
-	strcpy(new_symbol->value,leftSide);
+	strcpy(new_symbol->value,str);
 	if(isTerminal(new_symbol)){
 		new_symbol->isTerminal=1;
 	}
@@ -107,8 +113,12 @@ SymbolDef *  insertSymbolFromToken(SymbolList ** symbols,char * leftSide){
 	new_symbol->rules = NULL;
 	new_symbol->first = NULL;
 	new_symbol->follow = NULL;
+	return new_symbol;
+}
 
-	return insertSymbol(symbols,new_symbol);
+SymbolDef *  insertSymbolFromToken(SymbolList ** symbols,char * str){
+	
+	return insertSymbol(symbols,makeSymbol(str));
 	
 }
 
@@ -182,3 +192,16 @@ void printSymbolList(SymbolList * symbols,FILE *fp){
 	}
 }
 
+
+SymbolList *getRuleFromIndex(SymbolDef *symbol,int ruleNo){
+	RuleList *rules = symbol->rules;
+	int rNo = 0;
+	while(rules!=NULL){
+		if(rNo == ruleNo)
+			return rules->rule_tokens;
+		rules=rules->next;
+		rNo++;
+	}
+
+	return NULL;
+}

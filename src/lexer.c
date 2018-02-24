@@ -17,11 +17,20 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 	int state=1,offset=0;
 	char ch;
 	char *lexeme = (char*)malloc(MAX_LENGTH * sizeof(char));
+	memset(lexeme,'\0',MAX_LENGTH);
 	
 	while(1){
-		if(*(*fileBuff)=='\0')
+		if(*(*fileBuff)=='\0'){
+			memset(*fileBuff,'\0',BUFF_SIZE);
 			fread(*fileBuff,1,BUFF_SIZE,fp);
+		}
 		ch=*(*fileBuff);
+
+		if(ch=='\0'){
+			strcpy(lexeme,"$");
+			state=0;
+			return setTokenValue(state,lexeme);
+		}
 
 		if(ch=='\n'){
 			if(state==1)
@@ -35,13 +44,13 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 		if(ch<0){
 			return setTokenValue(state,lexeme);
 		}
-
 		switch(state){
 			case 1:
 				switch(ch){
 					case ' ':
 					case '\t':
 					case '\n':
+					case '\r':
 						break;
 					case '#':
 						state = 2;
@@ -210,7 +219,7 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 						(*fileBuff)-=2;
 						return setTokenValue(state,lexeme);
 					}else{
-						(*fileBuff)-=1;
+						// (*fileBuff)-=1;
 						state = 24;
 					}
 				}else{
@@ -435,6 +444,7 @@ char *getTokenForFunctions(int id,char *name){
 
 char *getTokenFromId(int id,char * name){
 	switch(id){
+		case 0:return "EOF";
 		case 3:return "COMMENT";
 		case 4:return "SQO";
 		case 5:return "SQC";

@@ -1,2 +1,5 @@
-1 .and. 3
-.an_func1
+_main[ ]
+	function [string x] = _visibilityDemo[int a, int b]
+		real c;
+	end
+end

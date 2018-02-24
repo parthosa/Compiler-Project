@@ -4,14 +4,17 @@
 
 #define MAX_SYMBOLS 50
 #define EPSILON "_eps_" 
+#define ENDMARKER "$" 
 
-typedef struct {
+typedef struct SymbolDef SymbolDef;
+
+struct SymbolDef{
 	int isTerminal;
 	char value[100];
 	struct RuleList *rules;
 	struct SymbolList *first;
 	struct SymbolList *follow;
-} SymbolDef ;
+};
 
 
 typedef struct RuleList RuleList;
@@ -33,16 +36,20 @@ struct SymbolList {
 SymbolList * symbols;
 
 
-bool isEpsilon(SymbolDef * symbol);
-bool isTerminal(SymbolDef * symbol);
+int isEpsilon(SymbolDef * symbol);
+int isEndSymbol(SymbolDef * symbol);
+int isTerminal(SymbolDef * symbol);
 SymbolDef * getSymbolIndex(SymbolList ** symbols,char * sym_string);
 SymbolDef * insertSymbol(SymbolList ** symbols,SymbolDef *new_symbol);
-SymbolDef *  insertSymbolFromToken(SymbolList ** symbols,char * leftSide);
+SymbolDef * makeSymbol(char * str);
+SymbolDef *  insertSymbolFromToken(SymbolList ** symbols,char * str);
 void insertRule(SymbolDef **symbol,char * rightSide);
 int sizeOfList(SymbolList * symbols);
 int mergeList(SymbolList ** first_list, SymbolList * first,int includeEps);
 void printSymbolList(SymbolList * symbols,FILE *fp);
-bool hasEpsilon(SymbolList * symbols);
+int hasEpsilon(SymbolList * symbols);
 int allEpsilon(SymbolList * begin,SymbolList * end);
+void printSymbolList(SymbolList * symbols,FILE *fp);
+SymbolList *getRuleFromIndex(SymbolDef *symbol,int ruleNo);
 
 #endif

@@ -1,0 +1,81 @@
+Mainfunction -> main sqo sqc Stmtsandfunctiondefs end .
+Stmtsandfunctiondefs -> Stmtorfunctiondef Stmtsandfunctiondefsorempty .
+Stmtsandfunctiondefsorempty -> Stmtsandfunctiondefs.
+Stmtsandfunctiondefsorempty -> .
+Stmtorfunctiondef -> Stmt.
+Stmtorfunctiondef -> Functiondef .
+Stmt -> Declarationstmt.
+Stmt -> Assignmentstmt.
+Stmt -> Conditionalstmt.
+Stmt -> Iostmt.
+Stmt -> Funcstmt.
+Otherstmts -> Stmt Otherstmts.
+Otherstmts -> .
+Funcstmt -> Funcall semicolon .
+Declarationstmt -> Type Idlist semicolon .
+Assignmentstmt -> id assignop Righthandsideofid semicolon.
+Assignmentstmt -> sqo Idlist sqc assignop Righthandsideoftuple semicolon.
+Righthandsideofid -> Funcall.
+Righthandsideofid -> Arithmeticexpression.
+Righthandsideoftuple -> Funcall.
+Righthandsideoftuple -> size id .
+Conditionalstmt -> if Booleanexpression Stmt Otherstmts Elsestmt endif.
+Elsestmt -> else Stmt Otherstmts.
+Elsestmt -> .
+Iostmt -> read op id cl semicolon.
+Iostmt -> print op id cl semicolon .
+Matrix -> sqo Numberlist Morematrixnums sqc .
+Numberlist -> num Morenums .
+Morenums -> comma Numberlist.
+Morenums -> .
+Morematrixnums -> semicolon Numberlist Morematrixnums.
+Morematrixnums -> .
+Arithmeticexpression -> Term Arithmeticexpressionops.
+Arithmeticexpressionops -> Plusorminus Arithmeticexpression.
+Arithmeticexpressionops -> .
+Plusorminus -> plus.
+Plusorminus -> minus.
+Term -> Factor Termops.
+Termops -> Mulordiv Term.
+Termops ->  .
+Mulordiv -> mul.
+Mulordiv -> div .
+Factor -> op Arithmeticexpression cl.
+Factor -> Var .
+Booleanexpression -> op Booleanexpression cl Binarylogicalop op Booleanexpression cl.
+Booleanexpression -> not op Booleanexpression cl.
+Booleanexpression -> Constrainedvars Relationalop Constrainedvars .
+Binarylogicalop -> and.
+Binarylogicalop -> or .
+Relationalop -> lt.
+Relationalop -> le.
+Relationalop -> eq.
+Relationalop -> gt.
+Relationalop -> ge.
+Relationalop -> ne .
+Functiondef -> function sqo Parameterlist sqc assignop funid sqo Parameterlist sqc Stmtsandfunctiondefs end .
+Parameterlist -> Type id Remaininglist.
+Parameterlist -> .
+Remaininglist -> comma Type id Remaininglist.
+Remaininglist -> .
+Funcall -> funid op Funidlist cl  .
+Funidlist -> Idlist.
+Funidlist -> .
+Type -> int.
+Type -> real.
+Type -> string.
+Type -> matrix .
+Var -> id Matrixrest.
+Var -> num.
+Var -> rnum.
+Var -> size id .
+Var -> str.
+Var -> Matrix.
+Constrainedvars -> id.
+Constrainedvars -> num.
+Constrainedvars -> rnum.
+Matrixrest -> sqo num comma num sqc.
+Matrixrest -> .
+Idlist -> id Moreids .
+Moreids -> comma Idlist.
+Moreids -> .
