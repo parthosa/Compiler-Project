@@ -11,7 +11,7 @@ typedef struct SymbolDef SymbolDef;
 
 struct SymbolDef{
 	int isTerminal;
-	char value[100];
+	char value[30];
 	struct RuleList *rules;
 	struct SymbolList *first;
 	struct SymbolList *follow;

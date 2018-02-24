@@ -9,6 +9,7 @@
 #include "symbolStack.h"
 #include "lexer.h"
 
+ParseTree *pTree,*pTreeHead;
 
 
 void loadGrammar(char const *f_name){
@@ -107,6 +108,8 @@ int getIndexNumber(SymbolDef *symbol){
 	SymbolList * temp = symbols;
 	int ix = 1;
 	while(temp!=NULL){
+		if(temp->symbol == '\0')
+			return -1;
 		if(temp->symbol ==  symbol)
 			return ix;
 		if(temp->symbol->isTerminal == symbol->isTerminal && !isEpsilon(temp->symbol))
@@ -166,9 +169,9 @@ void insertRuleParseTable(SymbolDef *symbol,SymbolList *firsts,int ruleNo){
 		temp3=temp3->next;
 	}
 }
-
+SymbolList *temp;
 void initParseTable(){
-	SymbolList *temp = symbols;
+	temp = symbols;
 	int rowIx,colIx;
 
 	for(rowIx=0;rowIx<45;rowIx++){
@@ -194,9 +197,6 @@ void createParseTable(){
 	SymbolList *temp = symbols;
 	// int rowIx,colIx;
 	int ruleNo;
-	initParseTable();
-	
-	temp = symbols;
 	while(temp!=NULL){
 		ruleNo = 0;
 		if(temp->symbol->isTerminal==0){
@@ -236,8 +236,13 @@ void loadData(char const *gm_file,char const *first_file,char const *follow_file
 	loadFollow(follow_file);
 }
 
+
 void createParseTree(char const *file_name){
 	SymbolStack *symStack = NULL;
+
+	pTree = addChild(pTree,getSymbolIndex(&symbols,MAINFUNCTION));
+	pTreeHead = pTree;
+
 	tokenDesc tokenLex;
 
 	push(&symStack,makeSymbol(ENDSYMBOL));
@@ -253,12 +258,18 @@ void createParseTree(char const *file_name){
 	memset(fileBuff,'\0',BUFF_SIZE);
 
 	tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
+	// printf("Read: %20s%20s\n",getTokenFromId(tokenLex.id,tokenLex.name),tokenLex.name);
 	begin++;
 	do{
+		// printStack(symStack);
 		if(isEndSymbol(symStack->symbol) || symStack->symbol->isTerminal){
 			if(strcmp(symStack->symbol->value,getTokenFromId(tokenLex.id,tokenLex.name))==0){
 				pop(&symStack);	
+				while(pTree->sibling==NULL && pTree!=pTreeHead)
+					pTree = pTree->parent;
+				pTree = pTree->sibling;
 				tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
+				// printf("Read: %20s%20s\n",getTokenFromId(tokenLex.id,tokenLex.name),tokenLex.name);
 				begin++;
 				while(tokenLex.id==3){
 					tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
@@ -269,6 +280,7 @@ void createParseTree(char const *file_name){
 			else{
 				printf("1 SYNTACTIC ERROR\n");
 				printf("Expected %s \nFound %s\n",symStack->symbol->value,getTokenFromId(tokenLex.id,tokenLex.name));
+				printStack(symStack);
 				exit(0);
 			}
 		}else{
@@ -281,7 +293,12 @@ void createParseTree(char const *file_name){
 			}else{
 				pop(&symStack);	
 				SymbolList *rules = getRuleFromIndex(ptable[rowIx][colIx].symbol,ptable[rowIx][colIx].ruleNo);
-			
+				addChildren(&pTree,rules);
+				if(isEpsilon(rules->symbol)){
+					while(pTree->sibling==NULL && pTree!=pTreeHead)
+						pTree = pTree->parent;
+					pTree = pTree->sibling;
+				}
 				pushAll(&symStack,rules);
 				printf("%2d %s",++i,ptable[rowIx][colIx].symbol->value);
 				printf(" ==> ");
@@ -291,6 +308,8 @@ void createParseTree(char const *file_name){
 		}
 	}while(tokenLex.id!=0);
 
+	printTree(pTreeHead);
+	printf("\n");
 
 }
 
@@ -299,6 +318,7 @@ int main(int argc, char const *argv[])
 {
 	
 	loadData(argv[1],argv[2],argv[3]);
+	initParseTable();
 	createParseTable();
 	saveParseTable(argv[4]);
 	createParseTree(argv[5]);

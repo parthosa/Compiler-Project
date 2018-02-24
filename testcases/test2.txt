@@ -8,10 +8,10 @@ _main[ ]
 		m2 = "programming";
 		function [string s] = _concat[ ]
 			s = m1+m2;
-		end
+		end;
 		x = _concat( );
 		c = a/b;
 	end;
-	h = g + _visibilityDemo(2,3);
+	# h = g + _visibilityDemo(2,3);
 	print(h);
 end;

@@ -29,9 +29,9 @@ int getSize(SymbolStack  *root){
 
 void printStack(SymbolStack *root){
 	SymbolStack *tmp = root;
-	printf("\nStack\n");
+	printf("\tStack\n");
 	while(tmp!=NULL){
-		printf("%s\n",tmp->symbol->value);
+		printf("\t%s\n",tmp->symbol->value);
 		tmp=tmp->next;
 	}
 	printf("\n");

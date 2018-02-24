@@ -1,8 +1,5 @@
 _main[ ]
-	function [string x] = _visibilityDemo[int a, int b]
-		real c;
-		string m1, m2;
-	end;
+	string m1, m2;
 	# h = g + _visibilityDemo(2,3);
 	print(h);
 end;
