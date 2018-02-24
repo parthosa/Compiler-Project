@@ -4,7 +4,8 @@
 
 #define MAX_SYMBOLS 50
 #define EPSILON "_eps_" 
-#define ENDMARKER "$" 
+#define ENDSYMBOL "$" 
+#define MAINFUNCTION "<mainFunction>" 
 
 typedef struct SymbolDef SymbolDef;
 

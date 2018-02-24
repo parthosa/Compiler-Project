@@ -1,4 +1,4 @@
-<mainFunction> ===> MAIN SQO SQC <stmtsAndFunctionDefs> END 
+<mainFunction> ===> MAIN SQO SQC <stmtsAndFunctionDefs> END SEMICOLON
 <stmtsAndFunctionDefs> ===> <stmtOrFunctionDef> <stmtsAndFunctionDefsOrEmpty> 
 <stmtsAndFunctionDefsOrEmpty> ===> <stmtsAndFunctionDefs>
 <stmtsAndFunctionDefsOrEmpty> ===> _eps_
@@ -14,12 +14,12 @@
 <funcStmt> ===> <funCall> SEMICOLON 
 <declarationStmt> ===> <type> <idList> SEMICOLON 
 <assignmentStmt> ===> ID ASSIGNOP <rightHandSideOfId> SEMICOLON
-<assignmentStmt> ===> SQO <idList> SQC ASSIGNOP <rightHandSideOfTuple> SEMICOLON/
+<assignmentStmt> ===> SQO <idList> SQC ASSIGNOP <rightHandSideOfTuple> SEMICOLON
 <rightHandSideOfId> ===> <funCall>
 <rightHandSideOfId> ===> <arithmeticExpression>
 <rightHandSideOfTuple> ===> <funCall>
 <rightHandSideOfTuple> ===> SIZE ID 
-<conditionalStmt> ===> IF <booleanExpression> <stmt> <otherStmts> <elseStmt> ENDIF
+<conditionalStmt> ===> IF <booleanExpression> <stmt> <otherStmts> <elseStmt> ENDIF SEMICOLON
 <elseStmt> ===> ELSE <stmt> <otherStmts>
 <elseStmt> ===> _eps_
 <ioStmt> ===> READ OP ID CL SEMICOLON
@@ -53,7 +53,7 @@
 <relationalOp> ===> GT
 <relationalOp> ===> GE
 <relationalOp> ===> NE 
-<functionDef> ===> FUNCTION SQO <parameterList> SQC ASSIGNOP FUNID SQO <parameterList> SQC <stmtsAndFunctionDefs> END
+<functionDef> ===> FUNCTION SQO <parameterList> SQC ASSIGNOP FUNID SQO <parameterList> SQC <stmtsAndFunctionDefs> END SEMICOLON
 <parameterList> ===> <type> ID <remainingList>
 <parameterList> ===> _eps_
 <remainingList> ===> COMMA <type> ID <remainingList>

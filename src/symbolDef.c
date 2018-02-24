@@ -6,6 +6,8 @@
 #include "symbolDef.h"
 
 int isEpsilon(SymbolDef * symbol){
+	if(!symbol)
+		return 0;
 	if(strcmp(symbol->value,EPSILON)==0)
 		return 1;
 	else
@@ -13,7 +15,9 @@ int isEpsilon(SymbolDef * symbol){
 }
 
 int isEndSymbol(SymbolDef * symbol){
-	if(strcmp(symbol->value,ENDMARKER)==0)
+	if(!symbol)
+		return 0;
+	if(strcmp(symbol->value,ENDSYMBOL)==0)
 		return 1;
 	else
 		return 0;

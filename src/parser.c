@@ -9,21 +9,23 @@
 #include "symbolStack.h"
 #include "lexer.h"
 
+
+
 void loadGrammar(char const *f_name){
 	FILE * fp;
 	symbols = NULL;
 	char leftSide[100],rightSide[100];
 	char *line = NULL;
 	size_t len=0;
+	SymbolDef * symbol;
 	fp = fopen(f_name,"r");
 	if(fp==NULL){
 		printf("Invalid source file\n");
         return;
 	}
-
 	while(getline(&line,&len,fp)!=-1){
 		sscanf(line,"%s ===> %[^\n\t]",leftSide,rightSide);
-		SymbolDef * symbol = getSymbolIndex(&symbols,leftSide);
+		symbol = getSymbolIndex(&symbols,leftSide);
 		if(symbol==NULL){
 			symbol = insertSymbolFromToken(&symbols,leftSide);
 		}
@@ -120,7 +122,6 @@ int getIndexNumber(SymbolDef *symbol){
 SymbolList *getFirsts(SymbolList *symbolsLoc){
 	SymbolList * temp3 = symbolsLoc;
 	SymbolList * firsts = NULL;
-	int i=0;
 
 	while(temp3!=NULL){
 		if(temp3 == symbolsLoc || allEpsilon(symbolsLoc,temp3))
@@ -170,8 +171,8 @@ void initParseTable(){
 	SymbolList *temp = symbols;
 	int rowIx,colIx;
 
-	for(rowIx=0;rowIx<50;rowIx++){
-		for(colIx=0;colIx<50;colIx++){
+	for(rowIx=0;rowIx<45;rowIx++){
+		for(colIx=0;colIx<45;colIx++){
 			ptable[rowIx][colIx].symbol = NULL;
 			ptable[rowIx][colIx].ruleNo = -1;
 		}
@@ -191,7 +192,7 @@ void initParseTable(){
 
 void createParseTable(){
 	SymbolList *temp = symbols;
-	int rowIx,colIx;
+	// int rowIx,colIx;
 	int ruleNo;
 	initParseTable();
 	
@@ -214,8 +215,8 @@ void createParseTable(){
 void saveParseTable(char const *f_name){
 	FILE *fp = fopen(f_name,"w");
 	int rowIx,colIx;
-	for(rowIx=0;rowIx<50;rowIx++){
-		for(colIx=0;colIx<50;colIx++){
+	for(rowIx=0;rowIx<45;rowIx++){
+		for(colIx=0;colIx<45;colIx++){
 			if(ptable[rowIx][colIx].symbol!=NULL){
 				fprintf(fp,"%s",ptable[rowIx][colIx].symbol->value);
 				if(ptable[rowIx][colIx].ruleNo!=-1){
@@ -237,86 +238,66 @@ void loadData(char const *gm_file,char const *first_file,char const *follow_file
 
 void createParseTree(char const *file_name){
 	SymbolStack *symStack = NULL;
-	push(&symStack,makeSymbol("$"));
-	push(&symStack,getSymbolIndex(&symbols,"<mainFunction>"));
+	tokenDesc tokenLex;
 
+	push(&symStack,makeSymbol(ENDSYMBOL));
+	push(&symStack,getSymbolIndex(&symbols,MAINFUNCTION));
 
-	FILE *fp = fopen(file_name,"r");
-	tokenDesc token;
-	line = 1;
-	char *fileBuff = (char*)malloc(BUFF_SIZE*sizeof(char));
 	
-	// printf("%20s%20s%20s\n","Token Name","Lexeme","Line");
-	SymbolDef *k=NULL;
+	FILE *fp = fopen(file_name,"r");
+	char lexeme[MAX_LENGTH];
+	line = 1;
+	
+	int begin = 0,i=0;
+	char *fileBuff = (char*)malloc(BUFF_SIZE*sizeof(char));
+	memset(fileBuff,'\0',BUFF_SIZE);
 
-	token = getToken(fp,&fileBuff);
-	fileBuff++;
-	int i=0;
+	tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
+	begin++;
 	do{
-		printf("Read: %10s%10s\n",getTokenFromId(token.id,token.name),token.name);
-		printStack(symStack);
-		if(k!=NULL)
-			printf("%p n value : %s\n",k,k->value);
-		// printf("2,%p\n",symStack);
-		// printf("st_top sym:%p\n",symStack->symbol);
-		if(isEndSymbol(symStack->symbol) || symStack->symbol->isTerminal ){
-			if(strcmp(symStack->symbol->value,getTokenFromId(token.id,token.name))==0){
+		if(isEndSymbol(symStack->symbol) || symStack->symbol->isTerminal){
+			if(strcmp(symStack->symbol->value,getTokenFromId(tokenLex.id,tokenLex.name))==0){
 				pop(&symStack);	
-				token = getToken(fp,&fileBuff);
-				while(token.id==3)
-					token = getToken(fp,&fileBuff);
+				tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
+				begin++;
+				while(tokenLex.id==3){
+					tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
+					begin++;
+				}
 
-				// printf("Read: %10s%10s \t",getTokenFromId(token.id,token.name),token.name);
-				// int i;
-				// for(i=0;i<strlen(token.name);i++)
-				// 	printf("%d ",token.name[i]);
-				// printf("\n");
-				fileBuff++;
 			}
 			else{
 				printf("1 SYNTACTIC ERROR\n");
-				printf("Expected %s \nFound %s\n",symStack->symbol->value,getTokenFromId(token.id,token.name));
+				printf("Expected %s \nFound %s\n",symStack->symbol->value,getTokenFromId(tokenLex.id,tokenLex.name));
 				exit(0);
 			}
 		}else{
 			int rowIx = getIndexNumber(symStack->symbol);
-			int colIx = getIndexNumber(getSymbolIndex(&symbols,getTokenFromId(token.id,token.name)));
+			int colIx = getIndexNumber(getSymbolIndex(&symbols,getTokenFromId(tokenLex.id,tokenLex.name)));
 			if(ptable[rowIx][colIx].symbol==NULL){
 				printf("2 SYNTACTIC ERROR\n");
-				printf("No rule for (%s,%s)\n",symStack->symbol->value,getTokenFromId(token.id,token.name));
+				printf("No rule for (%s,%s)\n",symStack->symbol->value,getTokenFromId(tokenLex.id,tokenLex.name));
 				exit(0);
 			}else{
 				pop(&symStack);	
 				SymbolList *rules = getRuleFromIndex(ptable[rowIx][colIx].symbol,ptable[rowIx][colIx].ruleNo);
-				if(strcmp(ptable[rowIx][colIx].symbol->value,"<stmtsAndFunctionDefs>")==0){
-					SymbolList *t2 = rules;
-					while(t2!=NULL){
-						if(strcmp(t2->symbol->value,"<stmtsAndFunctionDefsOrEmpty>")==0){
-							k=t2->symbol;
-							printf("found %p\n",k);
-						}
-						t2=t2->next;
-					}
-					
-				}
+			
 				pushAll(&symStack,rules);
-				// printf("%2d %s",++i,ptable[rowIx][colIx].symbol->value);
-				// printf(" ==> ");
-				// printSymbolList(rules,NULL);
-				// printf("\n");
+				printf("%2d %s",++i,ptable[rowIx][colIx].symbol->value);
+				printf(" ==> ");
+				printSymbolList(rules,NULL);
+				printf("\n");
 			}
 		}
-		// printf("1\n");
-	}while(token.id!=0);
+	}while(tokenLex.id!=0);
 
-	// while(symStack){
-	// 	SymbolDef *symbol = pop(&symStack); 
-	// 	printf("%s\n",symbol->value);
-	// }
+
 }
+
 
 int main(int argc, char const *argv[])
 {
+	
 	loadData(argv[1],argv[2],argv[3]);
 	createParseTable();
 	saveParseTable(argv[4]);

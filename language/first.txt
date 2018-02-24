@@ -15,7 +15,6 @@
 <idList> --> ID, 
 <rightHandSideOfId> --> FUNID, OP, ID, NUM, RNUM, SIZE, STR, SQO, 
 <rightHandSideOfTuple> --> FUNID, SIZE, 
-SEMICOLON/ --> 
 <arithmeticExpression> --> OP, ID, NUM, RNUM, SIZE, STR, SQO, 
 <booleanExpression> --> OP, NOT, ID, NUM, RNUM, 
 <elseStmt> --> ELSE, _eps_, 

@@ -13,22 +13,25 @@ tokenDesc setTokenValue(int state,char * name){
 	return token;
 }
 
-tokenDesc getToken(FILE *fp,char **fileBuff){
+tokenDesc getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
 	int state=1,offset=0;
 	char ch;
-	char *lexeme = (char*)malloc(MAX_LENGTH * sizeof(char));
+	char *fileBuff = (*fileBuffInit)+(*begin);
 	memset(lexeme,'\0',MAX_LENGTH);
 	
 	while(1){
-		if(*(*fileBuff)=='\0'){
-			memset(*fileBuff,'\0',BUFF_SIZE);
-			fread(*fileBuff,1,BUFF_SIZE,fp);
+		if(*fileBuff=='\0'){
+			memset(*fileBuffInit,'\0',BUFF_SIZE);
+			fread(*fileBuffInit,1,BUFF_SIZE,fp);
+			*begin = 0;
+			fileBuff = (*fileBuffInit)+(*begin);
 		}
-		ch=*(*fileBuff);
+		ch=*fileBuff;
 
 		if(ch=='\0'){
 			strcpy(lexeme,"$");
 			state=0;
+			*begin = fileBuff- (*fileBuffInit);
 			return setTokenValue(state,lexeme);
 		}
 
@@ -36,12 +39,14 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 			if(state==1)
 				line++;
 			else if(state!=2){ // not for comment lines
-				(*fileBuff)-=1;
+				fileBuff-=1;
+				*begin = fileBuff- (*fileBuffInit);
 				return setTokenValue(state,lexeme);
 			}
 		}
 		// check for invalid characters
 		if(ch<0){
+			*begin = fileBuff- (*fileBuffInit);
 			return setTokenValue(state,lexeme);
 		}
 		switch(state){
@@ -58,46 +63,57 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 					case '[':
 						state = 4;
 						strcpy(lexeme,"[");
+						*begin = fileBuff- (*fileBuffInit);
 						return setTokenValue(state,lexeme);
 					case ']':
 						state = 5;
 						strcpy(lexeme,"]");
+						*begin = fileBuff- (*fileBuffInit);
 						return setTokenValue(state,lexeme);
 					case '(':
 						state = 6;
 						strcpy(lexeme,"(");
+						*begin = fileBuff- (*fileBuffInit);
 						return setTokenValue(state,lexeme);
 					case ')':
 						state = 7;
 						strcpy(lexeme,")");
+						*begin = fileBuff- (*fileBuffInit);
 						return setTokenValue(state,lexeme);
 					case ';':
 						state = 8;
 						strcpy(lexeme,";");
+						*begin = fileBuff- (*fileBuffInit);
 						return setTokenValue(state,lexeme);
 					case ',':
 						state = 9;
 						strcpy(lexeme,",");
+						*begin = fileBuff- (*fileBuffInit);
 						return setTokenValue(state,lexeme);
 					case '+':
 						state = 10;
 						strcpy(lexeme,"+");
+						*begin = fileBuff- (*fileBuffInit);
 						return setTokenValue(state,lexeme);
 					case '-':
 						state = 11;
 						strcpy(lexeme,"-");
+						*begin = fileBuff- (*fileBuffInit);
 						return setTokenValue(state,lexeme);
 					case '*':
 						state = 12;
 						strcpy(lexeme,"*");
+						*begin = fileBuff- (*fileBuffInit);
 						return setTokenValue(state,lexeme);
 					case '/':
 						state = 13;
 						strcpy(lexeme,"/");
+						*begin = fileBuff- (*fileBuffInit);
 						return setTokenValue(state,lexeme);
 					case '@':
 						state = 14;
 						strcpy(lexeme,"@");
+						*begin = fileBuff- (*fileBuffInit);
 						return setTokenValue(state,lexeme);
 					case'<':
 						state=15;
@@ -168,6 +184,7 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 					default:
 						state = 1;
 						strcpy(lexeme,"ERROR");
+						*begin = fileBuff- (*fileBuffInit);
 						return setTokenValue(state,lexeme);
 				}
 				break;
@@ -177,8 +194,9 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 					state=2;
 				}else{
 					state=3;
-					(*fileBuff)-=1;
+					fileBuff-=1;
 					strcpy(lexeme,"COMMENT");
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				break;
@@ -195,8 +213,9 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 						lexeme[offset++]=ch;
 					}
 					else{
-						(*fileBuff)-=1;
+						fileBuff-=1;
 					}
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				break;
@@ -205,9 +224,11 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 				if(ch=='='){
 					state++;
 					lexeme[offset++]=ch;
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}else{
 					strcpy(lexeme,"ERROR");
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				break;
@@ -215,15 +236,17 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 				if(isdigit(ch)){
 					state = 23;
 				}else if(ch=='.'){
-					if(isalpha(*(*fileBuff))){
-						(*fileBuff)-=2;
+					if(isalpha(*fileBuff)){
+						fileBuff-=2;
+						*begin = fileBuff- (*fileBuffInit);
 						return setTokenValue(state,lexeme);
 					}else{
-						// (*fileBuff)-=1;
+						// fileBuff-=1;
 						state = 24;
 					}
 				}else{
-					(*fileBuff)-=1;
+					fileBuff-=1;
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				lexeme[offset++] = ch;
@@ -234,6 +257,7 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 					lexeme[offset++] = ch;
 				}else{
 					strcpy(lexeme,"ERROR");
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				break;
@@ -241,32 +265,37 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 				if(isdigit(ch)){
 					state++;
 					lexeme[offset++] = ch;
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}else{
 					
 					strcpy(lexeme,"ERROR");
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				break;
 			case 27:
-				if (ch >= 'a' && ch <= 'z'){
+				if ((ch >= 'a' && ch <= 'z')|| ch==' '){
 					state=28;
 					lexeme[offset++] = ch;
 				}else{
 					strcpy(lexeme,"ERROR");
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				break;
 			case 28:
-				if (ch >= 'a' && ch <= 'z'){
+				if ((ch >= 'a' && ch <= 'z') || ch==' '){
 					state=28;
 					lexeme[offset++] = ch;
 				}else if(ch=='"'){
 					state=29;
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				else{
 					strcpy(lexeme,"ERROR");
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				break;
@@ -299,10 +328,12 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 				if(ch=='.'){
 					state=33;
 					lexeme[offset++] = ch;
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				else{
 					strcpy(lexeme,"ERROR");
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				break;
@@ -311,6 +342,7 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 					state=35;
 				else{
 					strcpy(lexeme,"ERROR");
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				lexeme[offset++] = ch;
@@ -320,6 +352,7 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 					state=36;
 				else{
 					strcpy(lexeme,"ERROR");
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				lexeme[offset++] = ch;
@@ -328,10 +361,12 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 				if(ch=='.'){
 					state=37;
 					lexeme[offset++] = ch;
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				else{
 					strcpy(lexeme,"ERROR");
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				break;
@@ -340,6 +375,7 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 					state=39;
 				else{
 					strcpy(lexeme,"ERROR");
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				lexeme[offset++] = ch;
@@ -349,6 +385,7 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 					state=40;
 				else{
 					strcpy(lexeme,"ERROR");
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				lexeme[offset++] = ch;
@@ -357,10 +394,12 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 				if(ch=='.'){
 					state=41;
 					lexeme[offset++] = ch;
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				else{
 					strcpy(lexeme,"ERROR");
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				break;
@@ -371,9 +410,11 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 				}else if(isdigit(ch)){
 					state=43;
 					lexeme[offset++] = ch;
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}else{
-					(*fileBuff)-=1;
+					fileBuff-=1;
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				break;
@@ -383,6 +424,7 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 					lexeme[offset++] = ch;
 				}else{
 					strcpy(lexeme,"ERROR");
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				break;
@@ -391,18 +433,21 @@ tokenDesc getToken(FILE *fp,char **fileBuff){
 					state=45;
 					lexeme[offset++] = ch;
 				}else{
-					(*fileBuff)-=1;
+					fileBuff-=1;
 					fflush(stdout);
+					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme);
 				}
 				break;
 			default:
 				strcpy(lexeme,"ERROR");
+				*begin = fileBuff- (*fileBuffInit);
 				return setTokenValue(state,lexeme);
 		}
-		(*fileBuff)++;
+		fileBuff++;
 	}
 	state = 1;
+	*begin = fileBuff- (*fileBuffInit);
 	return setTokenValue(state,lexeme);
 }
 

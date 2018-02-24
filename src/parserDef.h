@@ -10,7 +10,7 @@ struct ParseTable {
 	int ruleNo;
 };
 
-ParseTable ptable[50][50];
+ParseTable ptable[45][45];
 
 // typedef struct ParseTree ParseTree;
 

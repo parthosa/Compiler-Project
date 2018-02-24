@@ -14,8 +14,7 @@
 <type> --> ID, 
 <idList> --> SEMICOLON, SQC, CL, 
 <rightHandSideOfId> --> SEMICOLON, 
-<rightHandSideOfTuple> --> 
-SEMICOLON/ --> END, ENDIF, ELSE, ID, SQO, IF, READ, PRINT, INT, REAL, STRING, MATRIX, FUNID, FUNCTION, 
+<rightHandSideOfTuple> --> SEMICOLON, 
 <arithmeticExpression> --> SEMICOLON, CL, 
 <booleanExpression> --> CL, ID, SQO, IF, READ, PRINT, INT, REAL, STRING, MATRIX, FUNID, 
 <elseStmt> --> ENDIF, 
