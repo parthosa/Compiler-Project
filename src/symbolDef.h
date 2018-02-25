@@ -3,7 +3,7 @@
 
 
 #define MAX_SYMBOLS 50
-#define EPSILON "_eps_" 
+#define EPSILON "-e-" 
 #define ENDSYMBOL "$" 
 #define MAINFUNCTION "<mainFunction>" 
 

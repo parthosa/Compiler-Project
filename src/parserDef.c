@@ -6,6 +6,8 @@
 ParseTree *newNode(SymbolDef * symbol){
 	ParseTree *newSym = (ParseTree*) malloc(sizeof(ParseTree));
 	newSym->symbol=symbol;
+	// newSym->token = NULL;
+	// memset(&newSym->token, '\0', sizeof(newSym->token));
 	newSym->firstChild = NULL;
 	newSym->parent = NULL;
 	newSym->sibling = NULL;
@@ -45,20 +47,50 @@ void addChildren(ParseTree **root,SymbolList *symbols){
 }
 
 
-void printTree(ParseTree *root){
+
+
+// char *getNameFromToken(tokenDesc token){
+// 	// if(token==0)
+// 	// 	return "---";
+// 	// else
+// 	return token.name;
+// }
+
+char *getParentValue(ParseTree *node){
+	if(node->parent==NULL)
+		return "ROOT";
+	else
+		return node->parent->symbol->value;
+}
+
+
+char *isLeaf(ParseTree *node){
+	if(node->symbol->isTerminal)
+		return "Yes";
+	else
+		return "No";
+}
+
+
+
+void printTree(ParseTree *root,FILE *fp){
 	if(root==NULL)
 		return;
 
 	if(root->symbol->isTerminal==1){
-		printf("%s ",root->symbol->value);
+		if(!isEpsilon(root->symbol))
+			fprintf(fp,"%-20s%-10d%-20s%-30s%-10s%-30s\n",root->token.name,root->token.line,root->symbol->value,getParentValue(root),isLeaf(root),root->symbol->value);
+		else
+			fprintf(fp,"%-20s%-10s%-20s%-30s%-10s%-30s\n","---","---",root->symbol->value,getParentValue(root),isLeaf(root),root->symbol->value);
 		return;
 	}
+	fprintf(fp,"%-20s%-10s%-20s%-30s%-10s%-30s\n","---","---","---",getParentValue(root),isLeaf(root),root->symbol->value);
 
 	ParseTree *child = root->firstChild;
 	while(child!=NULL){
-		printTree(child);
+		printTree(child,fp);
 		child=child->sibling;
 	}
 	return;
-
 }
+

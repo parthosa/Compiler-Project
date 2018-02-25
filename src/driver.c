@@ -19,7 +19,7 @@ void printTokens(char const *file_name){
 
 	do{
 		token = getToken(fp,&fileBuff,lexeme,&begin);
-		printf("%20s%20s%20d\n",getTokenFromId(token.id,token.name),token.name,line);
+		printf("%20s%20s%20d\n",getTokenFromId(token.id,token.name),token.name,token.line);
 		begin++;
 	}while(token.id!=0);
 	free(fileBuff);

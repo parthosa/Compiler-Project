@@ -4,4 +4,4 @@ _main[]
 	a = a + b*c-d*e;
 	# whether variable identifiers are declared or not will be seen by the semantic analyzer
 	print(a);
-end;
+end

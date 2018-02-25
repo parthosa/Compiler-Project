@@ -5,4 +5,4 @@ _main[]
 	# above should be syntactically correct
 	a = @s;
 	print(a);
-end;
+end

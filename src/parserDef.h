@@ -4,6 +4,7 @@
 
 
 #include "symbolDef.h"
+#include "langDef.h"
 
 typedef struct ParseTable ParseTable;
 
@@ -18,6 +19,7 @@ typedef struct ParseTree ParseTree;
 
 struct ParseTree {
 	SymbolDef * symbol;
+	tokenDesc token;
 	struct ParseTree *firstChild;
 	struct ParseTree *sibling;
 	struct ParseTree *parent;
@@ -27,5 +29,5 @@ struct ParseTree {
 
 ParseTree *addChild(ParseTree *root,SymbolDef *symbol);
 void addChildren(ParseTree **root,SymbolList *symbols);
-void printTree(ParseTree *root);
+void printTree(ParseTree *root,FILE *fp);
 #endif

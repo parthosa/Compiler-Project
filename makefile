@@ -11,6 +11,12 @@ firstfollow:
 	gcc -Wall -fno-stack-protector src/firstAndFollow.c -c -o out/firstAndFollow.o
 	gcc -Wall -fno-stack-protector -o build/firstAndFollow out/symbolDef.o out/firstAndFollow.o
 
+	
+run_firstfollow:
+	./build/firstAndFollow language/grammar.txt language/first.txt language/follow.txt
+	
+
+
 parser:
 	gcc -Wall -fno-stack-protector src/symbolDef.c -g -c -o out/symbolDef.o 
 	gcc -Wall -fno-stack-protector src/parserDef.c -g -c -o out/parserDef.o 
@@ -20,7 +26,7 @@ parser:
 	gcc -Wall -fno-stack-protector -g -o build/parser out/parser.o out/symbolDef.o out/parserDef.o out/symbolStack.o out/lexer.o
 	
 run_parser:
-	./build/parser language/grammar.txt language/first.txt language/follow.txt language/parseTable.csv testcases/testcase3.txt
+	./build/parser language/grammar.txt language/first.txt language/follow.txt language/parseTable.csv testcases/testcase1.txt language/parseTree.txt
 	
 
 

@@ -10,5 +10,5 @@ _main[     ]
 	string ccSubmission;
 	ccSubmission = _concatenate(str1, blankSTR);
 	ccSubmission = _concatenate(ccSubmission, str2);
-end;
+end
 
