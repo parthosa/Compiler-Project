@@ -218,6 +218,12 @@ tokenDesc getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
 			case 17:
 			case 19:
 				if(strcmp(lexeme,"=")==0 && ch=='/'){
+					if(*(fileBuff+1)!='='){ // check for empty
+						// printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
+						fileBuff-=1;
+						*begin = fileBuff- (*fileBuffInit);
+						return setTokenValue(state,lexeme,line);
+					}
 					state=21;
 					lexeme[offset++]=ch;
 				}

@@ -1,8 +1,7 @@
 _main[]
 	matrix mat1, mat2;
 	read(mat1);
-	mat2 = [6, 1, 10; 6, 10, 0] + a12;
-	
+	mat2 = [6, 1, 10; 6, 10, 0];
 	#a12 will be tokenized as ID NUM and will cause syntax error above
 	#as a1 will be the valid ID and then remaining 2 will be the NUM 
 

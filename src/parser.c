@@ -10,7 +10,7 @@
 #include "lexer.h"
 
 ParseTree *pTree,*pTreeHead;
-
+SymbolStack *symStack;
 
 void loadGrammar(char const *f_name){
 	FILE * fp;
@@ -238,12 +238,14 @@ void loadData(char const *gm_file,char const *first_file,char const *follow_file
 
 
 void createParseTree(char const *file_name){
-	SymbolStack *symStack = NULL;
+	symStack = NULL;
 
 	pTree = addChild(pTree,getSymbolIndex(&symbols,MAINFUNCTION));
 	pTreeHead = pTree;
 
 	tokenDesc tokenLex;
+	SymbolDef *prevSym;
+	int panicMode = 0;
 
 	push(&symStack,makeSymbol(ENDSYMBOL));
 	push(&symStack,getSymbolIndex(&symbols,MAINFUNCTION));
@@ -263,17 +265,16 @@ void createParseTree(char const *file_name){
 		tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
 		begin++;
 	}
-	// printf("%s ",getTokenFromId(tokenLex.id,tokenLex.name));
 	do{
 		if(isEndSymbol(symStack->symbol) || symStack->symbol->isTerminal){
 			if(strcmp(symStack->symbol->value,getTokenFromId(tokenLex.id,tokenLex.name))==0){
-				pop(&symStack);	
+				panicMode=0;
+				prevSym = pop(&symStack);	
 				pTree->token = tokenLex;
 				while(pTree->sibling==NULL && pTree!=pTreeHead)
 					pTree = pTree->parent;
 				pTree = pTree->sibling;
 				tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
-				// printf("%s ",getTokenFromId(tokenLex.id,tokenLex.name));
 				begin++;
 				while(tokenLex.id==-1){
 					tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
@@ -286,19 +287,42 @@ void createParseTree(char const *file_name){
 
 			}
 			else{
-				printf("1 SYNTACTIC ERROR\n");
-				printf("Expected %s \nFound %s\n",symStack->symbol->value,getTokenFromId(tokenLex.id,tokenLex.name));
-				printStack(symStack);
-				exit(0);
+				if(!panicMode){
+					printf("%d: Syntax error: The token '%s' for lexeme '%s' does not match at line %d. The expected token here is '%s' \n",tokenLex.line,getTokenFromId(tokenLex.id,tokenLex.name),tokenLex.name,tokenLex.line,symStack->symbol->value);
+
+				}
+				panicMode=1;
+				pop(&symStack);
+				if(pTree){
+					pTree->token = tokenLex;
+					while(pTree->sibling==NULL && pTree!=pTreeHead)
+						pTree = pTree->parent;
+					pTree = pTree->sibling;
+					tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
+					begin++;
+				}
 			}
 		}else{
 			int rowIx = getIndexNumber(symStack->symbol);
 			int colIx = getIndexNumber(getSymbolIndex(&symbols,getTokenFromId(tokenLex.id,tokenLex.name)));
 			if(ptable[rowIx][colIx].symbol==NULL){
-				printf("2 SYNTACTIC ERROR\n");
-				printf("No rule for (%s,%s)\n",symStack->symbol->value,getTokenFromId(tokenLex.id,tokenLex.name));
-				exit(0);
+				if(!panicMode){
+					printf("%d: Syntax error: The token '%s' for lexeme '%s' does not match at line %d.\n",tokenLex.line,getTokenFromId(tokenLex.id,tokenLex.name),tokenLex.name,tokenLex.line);
+					// printf("err\n");
+				}
+				panicMode=1;
+				while(checkInList(symStack->symbol->follow,getSymbolIndex(&symbols,getTokenFromId(tokenLex.id,tokenLex.name)))==0 && strcmp("SEMICOLON",getTokenFromId(tokenLex.id,tokenLex.name))!=0){
+					tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
+					begin++;
+				}
+
+				pop(&symStack);
+				while(pTree->sibling==NULL && pTree!=pTreeHead)
+					pTree = pTree->parent;
+				pTree = pTree->sibling;
+
 			}else{
+				panicMode=0;
 				pop(&symStack);	
 				SymbolList *rules = getRuleFromIndex(ptable[rowIx][colIx].symbol,ptable[rowIx][colIx].ruleNo);
 				addChildren(&pTree,rules);
@@ -314,7 +338,7 @@ void createParseTree(char const *file_name){
 				// printf("\n");
 			}
 		}
-	}while(tokenLex.id!=0);
+	}while(tokenLex.id!=0 && symStack!=NULL);
 
 
 }

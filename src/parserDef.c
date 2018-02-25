@@ -89,10 +89,13 @@ void printTree(ParseTree *root,FILE *fp){
 	printTree(child,fp);
 	fprintf(fp,"%-20s%-10s%-20s%-30s%-10s%-30s\n","---","---","---",getParentValue(root),isLeaf(root),root->symbol->value);
 	
-	child=child->sibling;
-	while(child!=NULL){
-		printTree(child,fp);
+	if(child){
 		child=child->sibling;
+		while(child!=NULL){
+			printTree(child,fp);
+			child=child->sibling;
+		}
+		
 	}
 	return;
 }

@@ -1,0 +1,17 @@
+for every -1 in pTable:
+	if t in follow of NT -> pop nt from stack
+	else -> discard (remv) t from string (scan)
+
+	
+void Error {
+	do {
+		do {
+			if (the configuration is valid)
+				{dignostic print
+				return}
+			discard the symbol at the top of the stack
+		} while (stack is not empty)
+		restore the stack
+		advances the reading head
+	} while the string is terminated
+}

@@ -209,3 +209,13 @@ SymbolList *getRuleFromIndex(SymbolDef *symbol,int ruleNo){
 
 	return NULL;
 }
+
+int checkInList(SymbolList *symbols,SymbolDef *symbol){
+	SymbolList *temp =  symbols;
+	while(temp!=NULL){
+		if(temp->symbol==symbol)
+			return 1;
+		temp=temp->next;
+	}
+	return 0;
+}

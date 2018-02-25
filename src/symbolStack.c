@@ -43,13 +43,15 @@ void push(SymbolStack **root,SymbolDef * symbol){
 	*root = newSym;
 }
 
-void pop(SymbolStack **root){
+SymbolDef *pop(SymbolStack **root){
 	if(*root==NULL)
-		return;
+		return NULL;
 
 	SymbolStack *temp = *root;
+	SymbolDef *tmp = temp->symbol;
 	*root = (*root) ->next;
 	free(temp);
+	return tmp;
 }
 
 void pushAll(SymbolStack **root,SymbolList *symbols){

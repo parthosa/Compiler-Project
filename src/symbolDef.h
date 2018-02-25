@@ -52,5 +52,6 @@ int hasEpsilon(SymbolList * symbols);
 int allEpsilon(SymbolList * begin,SymbolList * end);
 void printSymbolList(SymbolList * symbols,FILE *fp);
 SymbolList *getRuleFromIndex(SymbolDef *symbol,int ruleNo);
+int checkInList(SymbolList *symbols,SymbolDef *symbol);
 
 #endif

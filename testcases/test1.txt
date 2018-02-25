@@ -1,13 +1,18 @@
-_main[     ]
-	string str1, str2;
-	matrix m1;
-	str1 = "eradicate";
-	blankSTR = "  ";
-	str2 = "plagiarism";
-	function [string s]= _concatenate[string a, string a2]
-		str1 = a;
+_main[]
+	matrix mat1, mat2;
+	read(mat1);
+	mat2 = [6, 1, 10; 6, 10, 0; 12,b] + a12;
+	function [string x] = _visibilityDemo[int a, int b]
+		real c;
+		string m1, m2;
+		m1 = @"computer";
+		m2 = "programming";
+		function [string s] = _concat[ ]
+			x = 34.x;
+		end;
+		x = _concat( );
+		c = a/b;
 	end;
-	string ccSubmission;
-	ccSubmission = _concatenate(str1, blankSTR);
-	ccSubmission = _concatenate(ccSubmission, str2);
+	h = g + _visibilityDemo(2,3);
+	print(h);
 end

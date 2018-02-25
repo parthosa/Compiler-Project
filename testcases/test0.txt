@@ -1,1 +1,43 @@
-32.xd.12
+_main[]
+  int a, b;
+  a = 10;
+  b = "nothing";
+  c = a*b + d;
+  if ((((c==d).and.(a>=b)).or.(.not.(a>b))).and.(a=/=b))
+    string s;
+    s = "done";
+  else
+    string s;
+    s = "not done";
+  endif;
+  matrix mat1;
+  mat1 = [1,2,3,4;2;3];
+  b = @m;
+  function [string a, string g] = _lolfun[string a, string g]
+    a = a;
+    g = @m;
+  end;
+  [a, v, f] = _lolfun(a, g);
+  print(a);
+  print(v);
+  #Will print a lot of things here
+  read(a);
+  print(a);
+  function [string a, string g] = _lolfun[string a, string g]
+    a = a;
+    g = @m;
+    function [int a, int g] = _lolfun[string a, string g]
+      a = a;
+      g = @m;
+      function [string a, string g] = _lolfun[string a, string g]
+        a = a;
+        g = @m;
+      end;
+    end;
+  end;
+  [a, b] = _lolfun(100, 100);
+  a = _lolfun(100, 100);
+  _lolfun(100, 10);
+  [a, b] = @m;
+  rajat = [1,2,3,4,5,6] + [1;2;3;4] + "abc" + @m + lol + (vig - _concat(10) * cool) / hahaha;
+end
