@@ -5,10 +5,9 @@ _main[     ]
 	blankSTR = "  ";
 	str2 = "plagiarism";
 	function [string s]= _concatenate[string a, string a2]
-		str1 = a + a2;
+		str1 = a;
 	end;
 	string ccSubmission;
 	ccSubmission = _concatenate(str1, blankSTR);
 	ccSubmission = _concatenate(ccSubmission, str2);
 end
-

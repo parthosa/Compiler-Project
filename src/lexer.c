@@ -15,7 +15,7 @@ tokenDesc setTokenValue(int state,char * name,int line){
 }
 
 tokenDesc getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
-	int state=1,offset=0;
+	int state=1,offset=0,tokLen=0,tokLenErr=0,unknownErr=0;
 	char ch;
 	char *fileBuff = (*fileBuffInit)+(*begin);
 	memset(lexeme,'\0',MAX_LENGTH);
@@ -28,10 +28,12 @@ tokenDesc getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
 			fileBuff = (*fileBuffInit)+(*begin);
 		}
 		ch=*fileBuff;
-
+		// printf("%c ",ch );
 		if(ch=='\0'){
-			strcpy(lexeme,"$");
-			state=0;
+			if(state==1){
+				strcpy(lexeme,"$");
+				state=0;
+			}
 			*begin = fileBuff- (*fileBuffInit);
 			return setTokenValue(state,lexeme,line);
 		}
@@ -39,8 +41,10 @@ tokenDesc getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
 		if(ch=='\n'){
 			if(state==1)
 				line++;
-			else if(state!=2){ // not for comment lines
+			else if(state!=2 && state!=23 && state!=42 && state!=45){ // not for comment lines
 				fileBuff-=1;
+				printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
+				state=-1;
 				*begin = fileBuff- (*fileBuffInit);
 				return setTokenValue(state,lexeme,line);
 			}
@@ -143,7 +147,10 @@ tokenDesc getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
 						break;
 					case '"':
 						state = 27;
-						// lexeme[offset++] = ch;
+						tokLen=0;
+						tokLenErr=0;
+						unknownErr=0;
+						lexeme[offset++] = ch;
 						break;
 					case '.':
 						state = 30;
@@ -176,15 +183,21 @@ tokenDesc getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
 					case 'y': case 'Y':
 					case 'z': case 'Z':
 						state = 42;
+						tokLen=0;
+						tokLenErr=0;
 						lexeme[offset++] = ch;
 						break;
 					case '_':
 						state = 44;
+						tokLen=0;
+						tokLenErr=0;
 						lexeme[offset++] = ch;
 						break;
 					default:
-						state = 1;
-						strcpy(lexeme,"ERROR");
+						state = -1;
+						// strcpy(lexeme,"ERROR");
+						lexeme[offset++] = ch;
+						printf("%d: Lexical Error: Unknown Symbol %s\n",line,lexeme);
 						*begin = fileBuff- (*fileBuffInit);
 						return setTokenValue(state,lexeme,line);
 				}
@@ -223,26 +236,37 @@ tokenDesc getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
 			// =/= 
 			case 21:
 				if(ch=='='){
-					state++;
 					lexeme[offset++]=ch;
+					state++;
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}else{
-					strcpy(lexeme,"ERROR");
+					// strcpy(lexeme,"ERROR");
+					fileBuff-=1;
+					state = -1;
+					printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
 				break;
 			case 23:
 				if(isdigit(ch)){
+					lexeme[offset++] = ch;
 					state = 23;
 				}else if(ch=='.'){
-					if(isalpha(*fileBuff)){
-						fileBuff-=2;
-						*begin = fileBuff- (*fileBuffInit);
-						return setTokenValue(state,lexeme,line);
+					if(isalpha(*(fileBuff+1))){
+						if(*(fileBuff+1)=='a'||*(fileBuff+1)=='o'||*(fileBuff+1)=='n'){
+							fileBuff-=1;
+							*begin = fileBuff- (*fileBuffInit);
+							return setTokenValue(state,lexeme,line);
+						}else{
+							fileBuff-=1;
+							*begin = fileBuff - (*fileBuffInit);
+							return setTokenValue(state,lexeme,line);
+						}
 					}else{
 						// fileBuff-=1;
+						lexeme[offset++] = ch;
 						state = 24;
 					}
 				}else{
@@ -250,37 +274,46 @@ tokenDesc getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
-				lexeme[offset++] = ch;
 				break;
 			case 24:
 				if(isdigit(ch)){
-					state++;
 					lexeme[offset++] = ch;
+					state++;
 				}else{
-					strcpy(lexeme,"ERROR");
-					*begin = fileBuff- (*fileBuffInit);
+					// strcpy(lexeme,"ERROR");
+					fileBuff-=1;
+					state = -1;
+					printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
+					*begin = fileBuff - (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
 				break;
 			case 25:
 				if(isdigit(ch)){
-					state++;
 					lexeme[offset++] = ch;
+					state++;
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}else{
 					
-					strcpy(lexeme,"ERROR");
+					// strcpy(lexeme,"ERROR");
+					fileBuff-=1;
+					state = -1;
+					printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
 				break;
 			case 27:
 				if ((ch >= 'a' && ch <= 'z')|| ch==' '){
-					state=28;
 					lexeme[offset++] = ch;
+					state=28;
+					tokLen++;
 				}else{
-					strcpy(lexeme,"ERROR");
+					// strcpy(lexeme,"ERROR");
+					fileBuff-=1;
+					state = -1;
+					printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
@@ -288,108 +321,168 @@ tokenDesc getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
 			case 28:
 				if ((ch >= 'a' && ch <= 'z') || ch==' '){
 					state=28;
-					lexeme[offset++] = ch;
+					tokLen++;
+					if(tokLen<=(MAX_LENGTH+1)){
+						lexeme[offset++] = ch;
+					}
+					else
+						tokLenErr=1;
 				}else if(ch=='"'){
 					state=29;
 					*begin = fileBuff- (*fileBuffInit);
+					tokLen++;
+					if(unknownErr){
+						state=-1;
+						lexeme[offset++] = ch;
+						printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
+						return setTokenValue(state,lexeme,line);
+					}
+					if(tokLenErr || tokLen>MAX_LENGTH+1){
+						state=-1;
+						printf("%d: Lexical Error: String is longer than the prescribed length: %s...\"\n",line,lexeme);
+						return setTokenValue(state,lexeme,line);
+					}
+					lexeme[offset++] = ch;
 					return setTokenValue(state,lexeme,line);
+
 				}
 				else{
-					strcpy(lexeme,"ERROR");
-					*begin = fileBuff- (*fileBuffInit);
-					return setTokenValue(state,lexeme,line);
+					state=28;
+					unknownErr=1;
+					if(tokLen<=(MAX_LENGTH+1)){
+						lexeme[offset++] = ch;
+					}
+					else
+						tokLenErr=1;
+					// strcpy(lexeme,"ERROR");
 				}
 				break;
 			case 30:
 				switch(ch){
 					case 'o':
+						lexeme[offset++] = ch;
 						state=31;
 						break;
 					case 'a':
+						lexeme[offset++] = ch;
 						state=34;
 						break;
 					case 'n':
+						lexeme[offset++] = ch;
 						state=38;
 						break;
 					default:
-						// throw err
+						if(!isalpha(ch))
+							fileBuff-=1;
+						else
+							lexeme[offset++] = ch;
+						state = -1;
+						printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
+						*begin = fileBuff- (*fileBuffInit);
+						return setTokenValue(state,lexeme,line);
 						break;
 				}
-				lexeme[offset++] = ch;
 				break;
 			case 31:
-				if(ch=='r')
+				if(ch=='r'){
+					lexeme[offset++] = ch;
 					state=32;
-				else{
-					// throw err
 				}
-				lexeme[offset++] = ch;
+				else{
+					fileBuff-=1;
+					state = -1;
+					printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
+					*begin = fileBuff- (*fileBuffInit);
+					return setTokenValue(state,lexeme,line);
+				}
 				break;
 			case 32:
 				if(ch=='.'){
-					state=33;
 					lexeme[offset++] = ch;
+					state=33;
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
 				else{
-					strcpy(lexeme,"ERROR");
+					// strcpy(lexeme,"ERROR");
+					fileBuff-=1;
+					state = -1;
+					printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
 				break;
 			case 34:
-				if(ch=='n')
+				if(ch=='n'){
+					lexeme[offset++] = ch;
 					state=35;
+				}
 				else{
-					strcpy(lexeme,"ERROR");
+					// strcpy(lexeme,"ERROR");
+					fileBuff-=1;
+					state = -1;
+					printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
-				lexeme[offset++] = ch;
 				break;
 			case 35:
-				if(ch=='d')
+				if(ch=='d'){
+					lexeme[offset++] = ch;
 					state=36;
+				}
 				else{
-					strcpy(lexeme,"ERROR");
+					// strcpy(lexeme,"ERROR");
+					fileBuff-=1;
+					state = -1;
+					printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
-				lexeme[offset++] = ch;
 				break;
 			case 36:
 				if(ch=='.'){
-					state=37;
 					lexeme[offset++] = ch;
+					state=37;
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
 				else{
-					strcpy(lexeme,"ERROR");
+					// strcpy(lexeme,"ERROR");
+					fileBuff-=1;
+					state = -1;
+					printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
 				break;
 			case 38:
-				if(ch=='o')
+				if(ch=='o'){
+					lexeme[offset++] = ch;
 					state=39;
+				}
 				else{
-					strcpy(lexeme,"ERROR");
+					// strcpy(lexeme,"ERROR");
+					fileBuff-=1;
+					state = -1;
+					printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
-				lexeme[offset++] = ch;
 				break;
 			case 39:
-				if(ch=='t')
+				if(ch=='t'){
+					lexeme[offset++] = ch;
 					state=40;
+				}
 				else{
-					strcpy(lexeme,"ERROR");
+					// strcpy(lexeme,"ERROR");
+					fileBuff-=1;
+					state = -1;
+					printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
-				lexeme[offset++] = ch;
 				break;
 			case 40:
 				if(ch=='.'){
@@ -399,7 +492,10 @@ tokenDesc getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
 					return setTokenValue(state,lexeme,line);
 				}
 				else{
-					strcpy(lexeme,"ERROR");
+					// strcpy(lexeme,"ERROR");
+					fileBuff-=1;
+					state = -1;
+					printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
@@ -407,24 +503,52 @@ tokenDesc getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
 			case 42:
 				if(isalpha(ch)){
 					state=42;
-					lexeme[offset++] = ch;
+					tokLen++;
+					if(tokLen<=MAX_LENGTH)
+						lexeme[offset++] = ch;
+					else
+						tokLenErr=1;
+						// strcpy(lexeme,"ERROR");
+						// printf("%d: Lexical Error: Identifier is longer than the prescribed length\n",line);
+						// return setTokenValue(state,lexeme,line)
 				}else if(isdigit(ch)){
 					state=43;
-					lexeme[offset++] = ch;
+					tokLen++;
+
 					*begin = fileBuff- (*fileBuffInit);
+					if(tokLenErr || tokLen>MAX_LENGTH){
+						// strcpy(lexeme,"ERROR");
+						state = -1;
+						printf("%d: Lexical Error: Identifier is longer than the prescribed length %s...\n",line,lexeme);
+						*begin = fileBuff- (*fileBuffInit);
+						return setTokenValue(state,lexeme,line);
+					}
+					lexeme[offset++] = ch;
 					return setTokenValue(state,lexeme,line);
 				}else{
 					fileBuff-=1;
+					if(tokLenErr){
+						// strcpy(lexeme,"ERROR");
+						state = -1;
+						printf("%d: Lexical Error: Identifier is longer than the prescribed length %s...\n",line,lexeme);
+						*begin = fileBuff- (*fileBuffInit);
+						return setTokenValue(state,lexeme,line);
+					}
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
+					
 				}
 				break;
 			case 44:
 				if(isalpha(ch)){
-					state=45;
+					tokLen++;
 					lexeme[offset++] = ch;
+					state=45;
 				}else{
-					strcpy(lexeme,"ERROR");
+					fileBuff-=1;
+					state = -1;
+					// strcpy(lexeme,"ERROR");
+					printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
@@ -432,16 +556,28 @@ tokenDesc getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
 			case 45:
 				if(isalpha(ch)||isdigit(ch)){
 					state=45;
-					lexeme[offset++] = ch;
+					tokLen++;
+					if(tokLen<=MAX_LENGTH)
+						lexeme[offset++] = ch;
+					else
+						tokLenErr=1;
 				}else{
 					fileBuff-=1;
-					fflush(stdout);
+					if(tokLenErr){
+						state = -1;
+						printf("%d: Lexical Error: Identifier is longer than the prescribed length %s...\n",line,lexeme);
+						*begin = fileBuff- (*fileBuffInit);
+						return setTokenValue(state,lexeme,line);
+					}
 					*begin = fileBuff- (*fileBuffInit);
 					return setTokenValue(state,lexeme,line);
 				}
 				break;
 			default:
-				strcpy(lexeme,"ERROR");
+				// strcpy(lexeme,"ERROR");
+				lexeme[offset++] = ch;
+				state = -1;
+				printf("%d: Lexical Error: Unknown Pattern %s\n",line,lexeme);
 				*begin = fileBuff- (*fileBuffInit);
 				return setTokenValue(state,lexeme,line);
 		}
@@ -519,6 +655,7 @@ char *getTokenFromId(int id,char * name){
 		case 42:
 		case 43:return getTokenForIdentifiers(id,name);
 		case 45:return getTokenForFunctions(id,name);
+		case -1:return "ERROR";
 		default:return "ERROR";
 	}
 }

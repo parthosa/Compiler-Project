@@ -1,12 +1,12 @@
 
-all: clean debug
+all: debug
 
-debug:
+debug:clean
 	gcc -Wall -fno-stack-protector src/lexer.c -g -c -o out/lexer.o 
 	gcc -Wall -fno-stack-protector src/driver.c -g -c -o out/driver.o
 	gcc -Wall -fno-stack-protector -g -o build/pcc out/lexer.o out/driver.o	
 
-firstfollow:
+firstfollow:clean
 	gcc -Wall -fno-stack-protector src/symbolDef.c -c -o out/symbolDef.o 
 	gcc -Wall -fno-stack-protector src/firstAndFollow.c -c -o out/firstAndFollow.o
 	gcc -Wall -fno-stack-protector -o build/firstAndFollow out/symbolDef.o out/firstAndFollow.o
@@ -17,7 +17,7 @@ run_firstfollow:
 	
 
 
-parser:
+parser: clean
 	gcc -Wall -fno-stack-protector src/symbolDef.c -g -c -o out/symbolDef.o 
 	gcc -Wall -fno-stack-protector src/parserDef.c -g -c -o out/parserDef.o 
 	gcc -Wall -fno-stack-protector src/parser.c -g -c -o out/parser.o
@@ -26,7 +26,7 @@ parser:
 	gcc -Wall -fno-stack-protector -g -o build/parser out/parser.o out/symbolDef.o out/parserDef.o out/symbolStack.o out/lexer.o
 	
 run_parser:
-	./build/parser language/grammar.txt language/first.txt language/follow.txt language/parseTable.csv testcases/testcase1.txt language/parseTree.txt
+	./build/parser language/grammar.txt language/first.txt language/follow.txt language/parseTable.csv testcases/testcase2.txt language/parseTree.txt
 	
 
 

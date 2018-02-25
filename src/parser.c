@@ -258,8 +258,12 @@ void createParseTree(char const *file_name){
 	memset(fileBuff,'\0',BUFF_SIZE);
 
 	tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
-	// printf("%s ",getTokenFromId(tokenLex.id,tokenLex.name));
 	begin++;
+	while(tokenLex.id==-1){
+		tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
+		begin++;
+	}
+	// printf("%s ",getTokenFromId(tokenLex.id,tokenLex.name));
 	do{
 		if(isEndSymbol(symStack->symbol) || symStack->symbol->isTerminal){
 			if(strcmp(symStack->symbol->value,getTokenFromId(tokenLex.id,tokenLex.name))==0){
@@ -271,6 +275,10 @@ void createParseTree(char const *file_name){
 				tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
 				// printf("%s ",getTokenFromId(tokenLex.id,tokenLex.name));
 				begin++;
+				while(tokenLex.id==-1){
+					tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
+					begin++;
+				}
 				while(tokenLex.id==3){
 					tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
 					begin++;
