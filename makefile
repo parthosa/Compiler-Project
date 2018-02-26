@@ -26,7 +26,7 @@ parser: clean
 	gcc -Wall -fno-stack-protector -g -o build/parser out/parser.o out/symbolDef.o out/parserDef.o out/symbolStack.o out/lexer.o
 	
 run_parser:
-	./build/parser language/grammar.txt language/first.txt language/follow.txt language/parseTable.csv testcases/test1.txt language/parseTree.txt
+	./build/parser language/grammar.txt language/first.txt language/follow.txt language/parseTable.csv testcases/testcase5.txt language/parseTree.txt
 
 gdb_run_parser:
 	gdb --args ./build/parser language/grammar.txt language/first.txt language/follow.txt language/parseTable.csv testcases/testcase5.txt language/parseTree.txt

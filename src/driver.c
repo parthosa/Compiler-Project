@@ -13,7 +13,7 @@ void printTokens(char const *file_name){
 	char *fileBuff = (char*)malloc(BUFF_SIZE*sizeof(char));
 	memset(fileBuff,'\0',BUFF_SIZE);
 
-	char lexeme[MAX_LENGTH];
+	char lexeme[MAX_LENGTH+1];
 	
 	printf("%20s%20s%20s\n","Token Name","Lexeme","Line");
 

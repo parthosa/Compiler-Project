@@ -79,15 +79,15 @@ void printTree(ParseTree *root,FILE *fp){
 
 	if(root->symbol->isTerminal==1){
 		if(!isEpsilon(root->symbol))
-			fprintf(fp,"%-20s%-10d%-20s%-30s%-10s%-30s\n",root->token.name,root->token.line,root->symbol->value,getParentValue(root),isLeaf(root),root->symbol->value);
+			fprintf(fp,"%-25s%-10d%-20s%-30s%-10s%-30s\n",root->token.name,root->token.line,root->symbol->value,getParentValue(root),isLeaf(root),root->symbol->value);
 		else
-			fprintf(fp,"%-20s%-10s%-20s%-30s%-10s%-30s\n","---","---",root->symbol->value,getParentValue(root),isLeaf(root),root->symbol->value);
+			fprintf(fp,"%-25s%-10s%-20s%-30s%-10s%-30s\n","---","---",root->symbol->value,getParentValue(root),isLeaf(root),root->symbol->value);
 		return;
 	}
 
 	ParseTree *child = root->firstChild;
 	printTree(child,fp);
-	fprintf(fp,"%-20s%-10s%-20s%-30s%-10s%-30s\n","---","---","---",getParentValue(root),isLeaf(root),root->symbol->value);
+	fprintf(fp,"%-25s%-10s%-20s%-30s%-10s%-30s\n","---","---","---",getParentValue(root),isLeaf(root),root->symbol->value);
 	
 	if(child){
 		child=child->sibling;

@@ -288,7 +288,7 @@ void createParseTree(char const *file_name){
 			}
 			else{
 				if(!panicMode){
-					printf("%d: Syntax error: The token '%s' for lexeme '%s' does not match at line %d. The expected token here is '%s' \n",tokenLex.line,getTokenFromId(tokenLex.id,tokenLex.name),tokenLex.name,tokenLex.line,symStack->symbol->value);
+					printf("%d: SYNTAX ERROR: The token '%s' for lexeme '%s' does not match . The expected token here is '%s' \n",tokenLex.line,getTokenFromId(tokenLex.id,tokenLex.name),tokenLex.name,symStack->symbol->value);
 
 				}
 				panicMode=1;
@@ -307,7 +307,7 @@ void createParseTree(char const *file_name){
 			int colIx = getIndexNumber(getSymbolIndex(&symbols,getTokenFromId(tokenLex.id,tokenLex.name)));
 			if(ptable[rowIx][colIx].symbol==NULL){
 				if(!panicMode){
-					printf("%d: Syntax error: The token '%s' for lexeme '%s' does not match at line %d.\n",tokenLex.line,getTokenFromId(tokenLex.id,tokenLex.name),tokenLex.name,tokenLex.line);
+					printf("%d: SYNTAX ERROR: The token '%s' for lexeme '%s' does not match .\n",tokenLex.line,getTokenFromId(tokenLex.id,tokenLex.name),tokenLex.name);
 					// printf("err\n");
 				}
 				panicMode=1;
