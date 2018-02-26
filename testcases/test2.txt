@@ -4,7 +4,7 @@ _main[ ]
 	function [string x] = _visibilityDemo[int a, int b]
 		real c;
 		string m1, m2;
-		m1 = "computer";
+		m1 = @"computer";
 		m2 = "programming";
 		function [string s] = _concat[ ]
 			s = m1+m2;

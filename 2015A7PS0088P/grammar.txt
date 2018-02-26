@@ -1,0 +1,84 @@
+<mainFunction> ===> MAIN SQO SQC <stmtsAndFunctionDefs> END
+<stmtsAndFunctionDefs> ===> <stmtOrFunctionDef> <stmtsAndFunctionDefsOrEmpty> 
+<stmtsAndFunctionDefsOrEmpty> ===> <stmtsAndFunctionDefs>
+<stmtsAndFunctionDefsOrEmpty> ===> _eps_
+<stmtOrFunctionDef> ===> <stmt>
+<stmtOrFunctionDef> ===> <functionDef> 
+<stmt> ===> <declarationStmt>
+<stmt> ===> <assignmentStmt>
+<stmt> ===> <conditionalStmt>
+<stmt> ===> <ioStmt>
+<stmt> ===> <funcStmt>
+<otherStmts> ===> <stmt> <otherStmts>
+<otherStmts> ===> _eps_
+<funcStmt> ===> <funCall> SEMICOLON 
+<declarationStmt> ===> <type> <idList> SEMICOLON 
+<assignmentStmt> ===> ID ASSIGNOP <rightHandSideOfId> SEMICOLON
+<assignmentStmt> ===> SQO <idList> SQC ASSIGNOP <rightHandSideOfTuple> SEMICOLON
+<rightHandSideOfId> ===> <arithmeticExpression>
+<rightHandSideOfTuple> ===> <funCall>
+<rightHandSideOfTuple> ===> SIZE ID 
+<conditionalStmt> ===> IF OP <booleanExpression> CL <stmt> <otherStmts> <elseStmt> ENDIF SEMICOLON
+<elseStmt> ===> ELSE <stmt> <otherStmts>
+<elseStmt> ===> _eps_
+<ioStmt> ===> READ OP ID CL SEMICOLON
+<ioStmt> ===> PRINT OP ID CL SEMICOLON 
+<matrix> ===> SQO <numberList> <moreMatrixNums> SQC 
+<numberList> ===> NUM <moreNums> 
+<moreNums> ===> COMMA <numberList>
+<moreNums> ===> _eps_
+<moreMatrixNums> ===> SEMICOLON <numberList> <moreMatrixNums>
+<moreMatrixNums> ===> _eps_
+<arithmeticExpression> ===> <term> <arithmeticExpressionOps>
+<arithmeticExpressionOps> ===> <plusOrMinus> <arithmeticExpression>
+<arithmeticExpressionOps> ===> _eps_
+<plusOrMinus> ===> PLUS
+<plusOrMinus> ===> MINUS
+<term> ===> <factor> <termOps>
+<termOps> ===> <mulOrDiv> <term>
+<termOps> ===> _eps_ 
+<mulOrDiv> ===> MUL
+<mulOrDiv> ===> DIV 
+<factor> ===> OP <arithmeticExpression> CL
+<factor> ===> <var>
+<booleanExpression> ===> OP <booleanExpression> CL <binaryLogicalOp> OP <booleanExpression> CL
+<booleanExpression> ===> NOT OP <booleanExpression> CL
+<booleanExpression> ===> <constrainedVars> <relationalOp> <constrainedVars> 
+<binaryLogicalOp> ===> AND
+<binaryLogicalOp> ===> OR 
+<relationalOp> ===> LT
+<relationalOp> ===> LE
+<relationalOp> ===> EQ
+<relationalOp> ===> GT
+<relationalOp> ===> GE
+<relationalOp> ===> NE 
+<functionDef> ===> FUNCTION SQO <parameterList> SQC ASSIGNOP FUNID SQO <parameterList> SQC <stmtsAndFunctionDefs> END SEMICOLON
+<parameterList> ===> <type> ID <remainingList>
+<parameterList> ===> _eps_
+<remainingList> ===> COMMA <type> ID <remainingList>
+<remainingList> ===> _eps_
+<funCall> ===> FUNID OP <funIdList> CL  
+<funIdList> ===> <varList>
+<funIdList> ===> _eps_
+<type> ===> INT
+<type> ===> REAL
+<type> ===> STRING
+<type> ===> MATRIX 
+<var> ===> ID <matrixRest>
+<var> ===> NUM
+<var> ===> RNUM
+<var> ===> SIZE ID 
+<var> ===> STR
+<var> ===> <matrix>
+<var> ===> <funCall>
+<constrainedVars> ===> ID
+<constrainedVars> ===> NUM
+<constrainedVars> ===> RNUM
+<matrixRest> ===> SQO NUM COMMA NUM SQC
+<matrixRest> ===> _eps_
+<varList> ===> <var> <moreVars> 
+<moreVars> ===> COMMA <varList>
+<moreVars> ===> _eps_
+<idList> ===> ID <moreIds> 
+<moreIds> ===> COMMA <idList>
+<moreIds> ===> _eps_

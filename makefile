@@ -38,7 +38,7 @@ gdb_run_parser:
 	
 
 run:
-	./build/pcc testcases/test0.txt language/parseTree_2.txt
+	./build/pcc testcases/test2.txt language/parseTree_2.txt
 
 gdb_run:
 	gdb --args ./build/pcc testcases/testcase2.txt language/parseTree_2.txt

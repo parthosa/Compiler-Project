@@ -95,16 +95,16 @@ int main(int argc, char const *argv[])
 		exit(0);
 	}
 
-	FILE *fp2 = fopen(argv[2],"r+");
+	FILE *fp2 = fopen(argv[2],"w");
 	if(fp2==NULL){
 		printf("ERROR: Source file does not exist\n");
 		exit(0);
 	}
 
-	char *grammarFile = "language/grammar.txt";
-	char *firstFile = "language/first.txt";
-	char *followFile = "language/follow.txt";
-	char *parseTableFile = "language/parseTable.csv";
+	char *grammarFile = "./grammar.txt";
+	char *firstFile = "./first.txt";
+	char *followFile = "./follow.txt";
+	char *parseTableFile = "./parseTable.csv";
 
 	printSeperator();
     printf("%41s\n","COMPILER CONSTRUCTION: STAGE 1");
