@@ -4,99 +4,11 @@
 #include <stdbool.h>
 #include <ctype.h>
 
-#include "symbolDef.h"
-#include "parserDef.h"
-#include "symbolStack.h"
+#include "symbolDefs.h"
+
+#include "parser.h"
 #include "lexer.h"
 
-ParseTree *pTree,*pTreeHead;
-SymbolStack *symStack;
-
-void loadGrammar(char const *f_name){
-	FILE * fp;
-	symbols = NULL;
-	char leftSide[100],rightSide[100];
-	char *line = NULL;
-	size_t len=0;
-	SymbolDef * symbol;
-	fp = fopen(f_name,"r");
-	if(fp==NULL){
-		printf("Invalid source file\n");
-        return;
-	}
-	while(getline(&line,&len,fp)!=-1){
-		sscanf(line,"%s ===> %[^\n\t]",leftSide,rightSide);
-		symbol = getSymbolIndex(&symbols,leftSide);
-		if(symbol==NULL){
-			symbol = insertSymbolFromToken(&symbols,leftSide);
-		}
-		insertRule(&symbol,rightSide);
-	}
-	
-
-	fclose(fp);
-}
-
-
-void loadFirst(char const *first_file){
-	FILE * fp;
-	char leftSide[100],rightSide[100];
-	char *line = NULL;
-	size_t len=0;
-	fp = fopen(first_file,"r");
-	if(fp==NULL){
-		printf("Invalid source file\n");
-        return;
-	}
-
-	SymbolList * temp = symbols;
-	while(temp!=NULL){
-		if(temp->symbol->isTerminal==1){
-			SymbolList *temp2 = NULL;
-			insertSymbol(&temp2,temp->symbol);
-			mergeList(&temp->symbol->first,temp2,1);
-		}
-		temp=temp->next;
-	}
-
-	while(getline(&line,&len,fp)!=-1){
-		sscanf(line,"%s --> %[^\n\t]",leftSide,rightSide);
-		SymbolDef * symbol = getSymbolIndex(&symbols,leftSide);
-		char * token = strtok(rightSide , ", ");
-		while(token!=NULL){
-	    	SymbolDef * symbol2 = getSymbolIndex(&symbols,token);
-	        insertSymbol(&symbol->first,symbol2);
-	        token = strtok(NULL, ", ");
-	    }
-	}
-
-}
-
-void loadFollow(char const *follow_file){
-	FILE * fp;
-	char leftSide[100],rightSide[200];
-	char *line = NULL;
-	size_t len=0;
-	fp = fopen(follow_file,"r");
-	if(fp==NULL){
-		printf("Invalid source file\n");
-        return;
-	}
-
-	while(getline(&line,&len,fp)!=-1){
-		sscanf(line,"%s --> %[^\n\t]",leftSide,rightSide);
-		SymbolDef * symbol = getSymbolIndex(&symbols,leftSide);
-		char * token = strtok(rightSide , ", ");
-		while(token!=NULL){
-	    	SymbolDef * symbol2 = getSymbolIndex(&symbols,token);
-	        insertSymbol(&symbol->follow,symbol2);
-	        token = strtok(NULL, ", ");
-	    }
-	}
-
-	fclose(fp);
-	
-}
 
 
 int getIndexNumber(SymbolDef *symbol){
@@ -169,9 +81,8 @@ void insertRuleParseTable(SymbolDef *symbol,SymbolList *firsts,int ruleNo){
 		temp3=temp3->next;
 	}
 }
-SymbolList *temp;
 void initParseTable(){
-	temp = symbols;
+	SymbolList *temp = symbols;
 	int rowIx,colIx;
 
 	for(rowIx=0;rowIx<45;rowIx++){
@@ -196,6 +107,7 @@ void initParseTable(){
 void createParseTable(){
 	SymbolList *temp = symbols;
 	// int rowIx,colIx;
+	initParseTable();
 	int ruleNo;
 	while(temp!=NULL){
 		ruleNo = 0;
@@ -230,32 +142,31 @@ void saveParseTable(char const *f_name){
 	}
 }
 
-void loadData(char const *gm_file,char const *first_file,char const *follow_file){
-	loadGrammar(gm_file);
-	loadFirst(first_file);
-	loadFollow(follow_file);
-}
+// void loadData(char const *gm_file,char const *first_file,char const *follow_file){
+// 	loadGrammar(gm_file);
+// 	loadFirst(first_file);
+// 	loadFollow(follow_file);
+// }
 
 
-void createParseTree(char const *file_name){
+void createParseTree(FILE *fp){
 	symStack = NULL;
 
 	pTree = addChild(pTree,getSymbolIndex(&symbols,MAINFUNCTION));
 	pTreeHead = pTree;
 
 	tokenDesc tokenLex;
-	SymbolDef *prevSym;
-	int panicMode = 0;
+
+	int panicMode = 0,isSyntacticallyCorrect = 1;
 
 	push(&symStack,makeSymbol(ENDSYMBOL));
 	push(&symStack,getSymbolIndex(&symbols,MAINFUNCTION));
 
 	
-	FILE *fp = fopen(file_name,"r");
 	char lexeme[MAX_LENGTH];
 	line = 1;
 	
-	int begin = 0,i=0;
+	int begin = 0;
 	char *fileBuff = (char*)malloc(BUFF_SIZE*sizeof(char));
 	memset(fileBuff,'\0',BUFF_SIZE);
 
@@ -265,11 +176,12 @@ void createParseTree(char const *file_name){
 		tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
 		begin++;
 	}
+
 	do{
 		if(isEndSymbol(symStack->symbol) || symStack->symbol->isTerminal){
 			if(strcmp(symStack->symbol->value,getTokenFromId(tokenLex.id,tokenLex.name))==0){
 				panicMode=0;
-				prevSym = pop(&symStack);	
+				pop(&symStack);	
 				pTree->token = tokenLex;
 				while(pTree->sibling==NULL && pTree!=pTreeHead)
 					pTree = pTree->parent;
@@ -292,6 +204,7 @@ void createParseTree(char const *file_name){
 
 				}
 				panicMode=1;
+				isSyntacticallyCorrect = 0;
 				pop(&symStack);
 				if(pTree){
 					pTree->token = tokenLex;
@@ -307,15 +220,16 @@ void createParseTree(char const *file_name){
 			int colIx = getIndexNumber(getSymbolIndex(&symbols,getTokenFromId(tokenLex.id,tokenLex.name)));
 			if(ptable[rowIx][colIx].symbol==NULL){
 				if(!panicMode){
+					printf("(%s,%s) not exist\n", symStack->symbol->value,getTokenFromId(tokenLex.id,tokenLex.name));
 					printf("%d: SYNTAX ERROR: The token '%s' for lexeme '%s' does not match .\n",tokenLex.line,getTokenFromId(tokenLex.id,tokenLex.name),tokenLex.name);
 					// printf("err\n");
 				}
 				panicMode=1;
+				isSyntacticallyCorrect = 0;
 				while(checkInList(symStack->symbol->follow,getSymbolIndex(&symbols,getTokenFromId(tokenLex.id,tokenLex.name)))==0 && strcmp("SEMICOLON",getTokenFromId(tokenLex.id,tokenLex.name))!=0){
 					tokenLex = getToken(fp,&fileBuff,lexeme,&begin);
 					begin++;
 				}
-
 				pop(&symStack);
 				while(pTree->sibling==NULL && pTree!=pTreeHead)
 					pTree = pTree->parent;
@@ -332,38 +246,39 @@ void createParseTree(char const *file_name){
 					pTree = pTree->sibling;
 				}
 				pushAll(&symStack,rules);
-				// printf("%2d %s",++i,ptable[rowIx][colIx].symbol->value);
+				// printf("%s",ptable[rowIx][colIx].symbol->value);
 				// printf(" ==> ");
 				// printSymbolList(rules,NULL);
 				// printf("\n");
 			}
 		}
 	}while(tokenLex.id!=0 && symStack!=NULL);
-
-
+	rewind(fp);
+	if(isSyntacticallyCorrect)
+		printf("\nInput source code is syntactically correct\n");
+	else
+		printf("\nInput source code has syntactic errors\n");
 }
 
 
-void saveParseTree(char const *f_name){
-	FILE *fp = fopen(f_name,"w");
-	if(fp==NULL){
-		printf("Invalid source file\n");
-        return;
-	}
+void saveParseTree(FILE *fp){
 
+	if(pTreeHead==NULL){
+		fprintf(fp,"ERROR: Cannot print parse tree before parsing\n");
+		return;
+	}
 	fprintf(fp,"%-20s%-10s%-20s%-30s%-10s%-30s\n","Lexeme","Line","Token","Parent Node","Leaf","Node");
 	printTree(pTreeHead,fp);
-	fclose(fp);
 }
 
-int main(int argc, char const *argv[])
-{
+// int main(int argc, char const *argv[])
+// {
 	
-	loadData(argv[1],argv[2],argv[3]);
-	initParseTable();
-	createParseTable();
-	saveParseTable(argv[4]);
-	createParseTree(argv[5]);
-	saveParseTree(argv[6]);
-	return 0;
-}
+// 	loadData(argv[1],argv[2],argv[3]);
+// 	initParseTable();
+// 	createParseTable();
+// 	saveParseTable(argv[4]);
+// 	createParseTree(argv[5]);
+// 	saveParseTree(argv[6]);
+// 	return 0;
+// }

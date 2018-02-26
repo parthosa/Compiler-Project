@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "symbolDef.h"
+#include "symbolDefs.h"
 
 int isEpsilon(SymbolDef * symbol){
 	if(!symbol)
@@ -218,4 +218,92 @@ int checkInList(SymbolList *symbols,SymbolDef *symbol){
 		temp=temp->next;
 	}
 	return 0;
+}
+
+
+void loadGrammar(char const *f_name){
+	if(symbols!=NULL)
+		return;
+	FILE * fp;
+	char leftSide[100],rightSide[100];
+	char *line = NULL;
+	size_t len=0;
+	SymbolDef * symbol;
+	fp = fopen(f_name,"r");
+	if(fp==NULL){
+		printf("Invalid source file\n");
+        return;
+	}
+	while(getline(&line,&len,fp)!=-1){
+		sscanf(line,"%s ===> %[^\n\t]",leftSide,rightSide);
+		symbol = getSymbolIndex(&symbols,leftSide);
+		if(symbol==NULL){
+			symbol = insertSymbolFromToken(&symbols,leftSide);
+		}
+		insertRule(&symbol,rightSide);
+	}
+	
+
+	fclose(fp);
+}
+
+
+void loadFirst(char const *first_file){
+	FILE * fp;
+	char leftSide[100],rightSide[100];
+	char *line = NULL;
+	size_t len=0;
+	fp = fopen(first_file,"r");
+	if(fp==NULL){
+		printf("Invalid source file\n");
+        return;
+	}
+
+	SymbolList * temp = symbols;
+	while(temp!=NULL){
+		if(temp->symbol->isTerminal==1){
+			SymbolList *temp2 = NULL;
+			insertSymbol(&temp2,temp->symbol);
+			mergeList(&temp->symbol->first,temp2,1);
+		}
+		temp=temp->next;
+	}
+
+	while(getline(&line,&len,fp)!=-1){
+		sscanf(line,"%s --> %[^\n\t]",leftSide,rightSide);
+		SymbolDef * symbol = getSymbolIndex(&symbols,leftSide);
+		char * token = strtok(rightSide , ", ");
+		while(token!=NULL){
+	    	SymbolDef * symbol2 = getSymbolIndex(&symbols,token);
+	        insertSymbol(&symbol->first,symbol2);
+	        token = strtok(NULL, ", ");
+	    }
+	}
+
+}
+
+void loadFollow(char const *follow_file){
+	FILE * fp;
+	char leftSide[100],rightSide[200];
+	char *line = NULL;
+	size_t len=0;
+	fp = fopen(follow_file,"r");
+	if(fp==NULL){
+		printf("Invalid source file\n");
+        return;
+	}
+
+	while(getline(&line,&len,fp)!=-1){
+		sscanf(line,"%s --> %[^\n\t]",leftSide,rightSide);
+		SymbolDef * symbol = getSymbolIndex(&symbols,leftSide);
+		char * token = strtok(rightSide , ", ");
+		while(token!=NULL){
+	    	SymbolDef * symbol2 = getSymbolIndex(&symbols,token);
+	        insertSymbol(&symbol->follow,symbol2);
+	        token = strtok(NULL, ", ");
+	    }
+	}
+
+	fclose(fp);
+	
 }

@@ -3,7 +3,7 @@
 #ifndef SYMBOLSTACK_H_INCLUDED
 #define SYMBOLSTACK_H_INCLUDED
 
-#include "symbolDef.h"
+#include "symbolDefs.h"
 
 typedef struct SymbolStack SymbolStack;
 

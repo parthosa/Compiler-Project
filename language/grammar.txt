@@ -18,7 +18,7 @@
 <rightHandSideOfId> ===> <arithmeticExpression>
 <rightHandSideOfTuple> ===> <funCall>
 <rightHandSideOfTuple> ===> SIZE ID 
-<conditionalStmt> ===> IF <booleanExpression> <stmt> <otherStmts> <elseStmt> ENDIF SEMICOLON
+<conditionalStmt> ===> IF OP <booleanExpression> CL <stmt> <otherStmts> <elseStmt> ENDIF SEMICOLON
 <elseStmt> ===> ELSE <stmt> <otherStmts>
 <elseStmt> ===> _eps_
 <ioStmt> ===> READ OP ID CL SEMICOLON

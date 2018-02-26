@@ -5,33 +5,8 @@
 #include <ctype.h>
 
 
-#include "symbolDef.h"
-
-
-void loadGrammar(char const *f_name){
-	FILE * fp;
-	symbols = NULL;
-	char leftSide[100],rightSide[100];
-	char *line = NULL;
-	size_t len=0;
-	fp = fopen(f_name,"rowIx");
-	if(fp==NULL){
-		printf("Invalid source file\n");
-        return;
-	}
-
-	while(getline(&line,&len,fp)!=-1){
-		sscanf(line,"%s ===> %[^\n\t]",leftSide,rightSide);
-		SymbolDef * symbol = getSymbolIndex(&symbols,leftSide);
-		if(symbol==NULL){
-			symbol = insertSymbolFromToken(&symbols,leftSide);
-		}
-		insertRule(&symbol,rightSide);
-	}
-	
-
-	fclose(fp);
-}
+#include "symbolDefs.h"
+#include "firstAndFollow.h"
 
 
 void findFirstAndFollow(){
@@ -117,19 +92,19 @@ void saveFirstAndFollow(char const *first_nm,char const *follow_nm){
 }
 
 
-int main(int argc, char const *argv[])
-{
-	if(argc < 2){
-		printf("ERROR: Grammar file name not provided\n");
-		exit(0);
-	}
-	if(argc < 4){
-		printf("ERROR: Output files names not provided\n");
-		exit(0);
-	}
+// int main(int argc, char const *argv[])
+// {
+// 	if(argc < 2){
+// 		printf("ERROR: Grammar file name not provided\n");
+// 		exit(0);
+// 	}
+// 	if(argc < 4){
+// 		printf("ERROR: Output files names not provided\n");
+// 		exit(0);
+// 	}
 
-	loadGrammar(argv[1]);
-	findFirstAndFollow();
-	saveFirstAndFollow(argv[2],argv[3]);
-	return 0;
-}
+// 	loadGrammar(argv[1]);
+// 	findFirstAndFollow();
+// 	saveFirstAndFollow(argv[2],argv[3]);
+// 	return 0;
+// }

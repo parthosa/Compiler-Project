@@ -3,7 +3,7 @@
 #define PARSERDEF_H_INCLUDED
 
 
-#include "symbolDef.h"
+#include "symbolDefs.h"
 #include "langDef.h"
 
 typedef struct ParseTable ParseTable;

@@ -1,5 +1,6 @@
-#ifndef SYMBOLDEF_H_INCLUDED
-#define SYMBOLDEF_H_INCLUDED
+
+#ifndef SYMBOLDEFS_H_INCLUDED
+#define SYMBOLDEFS_H_INCLUDED
 
 
 #define MAX_SYMBOLS 50
@@ -53,5 +54,8 @@ int allEpsilon(SymbolList * begin,SymbolList * end);
 void printSymbolList(SymbolList * symbols,FILE *fp);
 SymbolList *getRuleFromIndex(SymbolDef *symbol,int ruleNo);
 int checkInList(SymbolList *symbols,SymbolDef *symbol);
+void loadGrammar(char const *f_name);
+void loadFirst(char const *first_file);
+void loadFollow(char const *follow_file);
 
 #endif

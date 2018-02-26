@@ -684,3 +684,21 @@ char *getTokenFromId(int id,char * name){
 		default:return "ERROR";
 	}
 }
+
+
+void removeComments(char *testFile,char *cleanFile){
+	int i,j;
+	for(i=0,j=0;testFile[i]!='\0';i++){
+		if(testFile[i]=='#'){
+			while(testFile[i]!='\0' && testFile[i]!='\n')
+				i++;
+			i++;
+			while(testFile[i]!='\0' && (testFile[i]==' ' || testFile[i]=='\t'))
+				i++;
+			i--;
+		}else{
+			cleanFile[j] = testFile[i];
+			j++;
+		}
+	}
+}

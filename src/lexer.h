@@ -6,7 +6,7 @@
 
 tokenDesc getToken(FILE *fp,char **fileBuff,char *lexeme,int *begin);
 char *getTokenFromId(int id,char * name);
+void removeComments(char *testFile,char *cleanFile);
 
-int error_in_lexer;
 
 #endif

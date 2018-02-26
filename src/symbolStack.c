@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+
 #include "symbolStack.h"
+
 
 SymbolStack *newSymbol(SymbolDef * symbol){
 	SymbolStack *newSym = (SymbolStack*) malloc(sizeof(SymbolStack));

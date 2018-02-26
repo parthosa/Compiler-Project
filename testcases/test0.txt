@@ -3,8 +3,9 @@ _main[]
   a = 10;
   b = "nothing";
   c = a*b + d;
-  if ((((c==d).and.(a>=b)).or.(.not.(a>b))).and.(a=/=b))
-    string s;
+  # if ((((c==d).and.(a>=b)).or.(.not.(a>b))).and.(a=/=b))
+  if ((c==d).and.(a=/=b))
+    string g, h;
     s = "done";
   else
     string s;
