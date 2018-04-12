@@ -7,11 +7,14 @@
 #define PARSERDEF_H_INCLUDED
 
 
-#include "symbolDefs.h"
+#include "symbolDef.h"
 #include "langDef.h"
 
 typedef struct ParseTable ParseTable;
 
+/*
+* Data Structure to store the parse table
+*/
 struct ParseTable {
 	SymbolDef * symbol;
 	int ruleNo;
@@ -21,15 +24,17 @@ ParseTable ptable[45][45];
 
 typedef struct ParseTree ParseTree;
 
+/*
+* Data Structure to store the parse tree
+*/
 struct ParseTree {
 	SymbolDef * symbol;
-	tokenDesc token;
+	TokenInfo token;
 	struct ParseTree *firstChild;
 	struct ParseTree *sibling;
 	struct ParseTree *parent;
 };
 
-// ParseTree pTree;
 
 ParseTree *addChild(ParseTree *root,SymbolDef *symbol);
 void addChildren(ParseTree **root,SymbolList *symbols);

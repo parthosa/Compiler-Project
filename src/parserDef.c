@@ -54,7 +54,7 @@ void addChildren(ParseTree **root,SymbolList *symbols){
 
 
 
-// char *getNameFromToken(tokenDesc token){
+// char *getNameFromToken(TokenInfo token){
 // 	// if(token==0)
 // 	// 	return "---";
 // 	// else
@@ -83,16 +83,20 @@ void printTree(ParseTree *root,FILE *fp){
 		return;
 
 	if(root->symbol->isTerminal==1){
-		if(!isEpsilon(root->symbol))
-			fprintf(fp,"%-25s%-10d%-20s%-30s%-10s%-30s\n",root->token.name,root->token.line,root->symbol->value,getParentValue(root),isLeaf(root),root->symbol->value);
+		if(!isEpsilon(root->symbol)){
+			if(strcmp(root->symbol->value,"NUM")==0 || strcmp(root->symbol->value,"RNUM")==0)
+				fprintf(fp,"%-25s%-10d%-20s%-20s%-30s%-10s%-30s\n",root->token.name,root->token.line,root->symbol->value,root->token.name,getParentValue(root),isLeaf(root),root->symbol->value);
+			else
+				fprintf(fp,"%-25s%-10d%-20s%-20s%-30s%-10s%-30s\n",root->token.name,root->token.line,root->symbol->value,"---",getParentValue(root),isLeaf(root),root->symbol->value);
+		}
 		else
-			fprintf(fp,"%-25s%-10s%-20s%-30s%-10s%-30s\n","---","---",root->symbol->value,getParentValue(root),isLeaf(root),root->symbol->value);
+			fprintf(fp,"%-25s%-10s%-20s%-20s%-30s%-10s%-30s\n","---","---",root->symbol->value,"---",getParentValue(root),isLeaf(root),root->symbol->value);
 		return;
 	}
 
 	ParseTree *child = root->firstChild;
 	printTree(child,fp);
-	fprintf(fp,"%-25s%-10s%-20s%-30s%-10s%-30s\n","---","---","---",getParentValue(root),isLeaf(root),root->symbol->value);
+	fprintf(fp,"%-25s%-10s%-20s%-20s%-30s%-10s%-30s\n","---","---","---","---",getParentValue(root),isLeaf(root),root->symbol->value);
 	
 	if(child){
 		child=child->sibling;

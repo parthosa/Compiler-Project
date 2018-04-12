@@ -10,10 +10,12 @@
 #include <ctype.h>
 
 
-#include "symbolDefs.h"
+#include "symbolDef.h"
 #include "firstAndFollow.h"
 
-
+/*
+* Iterative function to calculate the first and follow sets
+*/
 void findFirstAndFollow(){
 
 	SymbolList * temp = symbols;

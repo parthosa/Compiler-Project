@@ -1,5 +1,5 @@
 _main[]
 	matrix mat1, mat2;
 	read(mat1);
-	mat2 = _asdfgdadfgdfghsfdghfdsghdfg(1,4) + 3 ;
+	mat2 = _asdf(1,4) + 3 ;
 end

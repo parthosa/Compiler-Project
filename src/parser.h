@@ -14,7 +14,7 @@
 void createParseTree(FILE *fp);
 void saveParseTable(char const *f_name);
 void createParseTable();
-void saveParseTree(FILE *fp);
+void saveParseTree(ParseTree *parseTree,FILE *fp);
 
 ParseTree *pTree,*pTreeHead;
 SymbolStack *symStack;

@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "symbolDefs.h"
+#include "symbolDef.h"
 
 int isEpsilon(SymbolDef * symbol){
 	if(!symbol)

@@ -37,7 +37,7 @@ void removeCommentsWrapper(FILE *fp){
 
 
 void printTokens(FILE *fp){
-	tokenDesc token;
+	TokenInfo token;
 	line = 1;
 	int begin = 0;
 	char *fileBuff = (char*)malloc(BUFF_SIZE*sizeof(char));

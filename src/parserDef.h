@@ -7,7 +7,7 @@
 #define PARSERDEF_H_INCLUDED
 
 
-#include "symbolDefs.h"
+#include "symbolDef.h"
 #include "langDef.h"
 
 typedef struct ParseTable ParseTable;
@@ -23,7 +23,7 @@ typedef struct ParseTree ParseTree;
 
 struct ParseTree {
 	SymbolDef * symbol;
-	tokenDesc token;
+	TokenInfo token;
 	struct ParseTree *firstChild;
 	struct ParseTree *sibling;
 	struct ParseTree *parent;

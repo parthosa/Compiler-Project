@@ -15,7 +15,7 @@ typedef struct
     int id;
     char name[MAX_LENGTH+1];
     int line;
-} tokenDesc;
+} TokenInfo;
 
 int line;
 

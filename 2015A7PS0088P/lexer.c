@@ -11,8 +11,8 @@
 #include "lexer.h"
 #include "langDef.h"
 
-tokenDesc setTokenValue(int state,char * name,int line){
-	tokenDesc token;
+TokenInfo setTokenValue(int state,char * name,int line){
+	TokenInfo token;
 	memset(token.name,'\0',MAX_LENGTH+1);
 	strcpy(token.name,name);
 	token.id=state;
@@ -20,7 +20,7 @@ tokenDesc setTokenValue(int state,char * name,int line){
 	return token;
 }
 
-tokenDesc getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
+TokenInfo getToken(FILE *fp,char **fileBuffInit,char *lexeme,int *begin){
 	int state=1,offset=0,tokLen=0,tokLenErr=0,unknownErr=0;
 	char ch;
 	char *fileBuff = (*fileBuffInit)+(*begin);

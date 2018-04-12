@@ -7,10 +7,13 @@
 #ifndef SYMBOLSTACK_H_INCLUDED
 #define SYMBOLSTACK_H_INCLUDED
 
-#include "symbolDefs.h"
+#include "symbolDef.h"
 
 typedef struct SymbolStack SymbolStack;
 
+/*
+* Data Structure to store the stack symbol 
+*/
 struct SymbolStack{
 	SymbolDef * symbol;
 	struct SymbolStack *next;

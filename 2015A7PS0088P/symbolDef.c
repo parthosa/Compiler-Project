@@ -8,7 +8,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "symbolDefs.h"
+#include "symbolDef.h"
+
 
 int isEpsilon(SymbolDef * symbol){
 	if(!symbol)
@@ -79,6 +80,9 @@ int allEpsilon(SymbolList * begin,SymbolList * end){
 }
 
 
+/*
+* Returns a pointer to the symbol corresponding the string value
+*/
 SymbolDef * getSymbolIndex(SymbolList ** symbols,char * sym_string){
 	SymbolList * temp = *symbols;
 	while(temp!=NULL){
@@ -89,6 +93,9 @@ SymbolDef * getSymbolIndex(SymbolList ** symbols,char * sym_string){
 	return NULL;
 }
 
+/*
+* Inserts a new symbol in the symbols list
+*/
 SymbolDef * insertSymbol(SymbolList ** symbols,SymbolDef *new_symbol){
 	SymbolList *new_symbol_ls  = (SymbolList*) malloc(sizeof(SymbolList));
 	SymbolList *last = *symbols;
@@ -111,6 +118,9 @@ SymbolDef * insertSymbol(SymbolList ** symbols,SymbolDef *new_symbol){
 	return new_symbol;
 }
 
+/*
+* Creates a new symbol from the string
+*/
 SymbolDef * makeSymbol(char * str){
 	SymbolDef* new_symbol = (SymbolDef*) malloc(sizeof(SymbolDef));
 	strcpy(new_symbol->value,str);
@@ -131,6 +141,9 @@ SymbolDef *  insertSymbolFromToken(SymbolList ** symbols,char * str){
 	
 }
 
+/*
+* Inserts the rule after tokeninzing into symbols
+*/
 void insertRule(SymbolDef **symbol,char * rightSide){
 	RuleList* new_rule  = (RuleList*) malloc(sizeof(RuleList));
 	RuleList *last = (*symbol)->rules;
@@ -171,6 +184,9 @@ int sizeOfList(SymbolList * symbols){
 	return count;
 }
 
+/*
+* Merge the second list in first and return if there were any changes or not
+*/
 int mergeList(SymbolList ** first_list, SymbolList * first,int includeEps){
 	SymbolList * temp = first;
 	int init_sz = sizeOfList(*first_list);
@@ -211,7 +227,9 @@ void printSymbolList(SymbolList * symbols,FILE *fp){
 	}
 }
 
-
+/*
+* Used to get the original from (using by parser)
+*/
 SymbolList *getRuleFromIndex(SymbolDef *symbol,int ruleNo){
 	RuleList *rules = symbol->rules;
 	int rNo = 0;
@@ -235,7 +253,9 @@ int checkInList(SymbolList *symbols,SymbolDef *symbol){
 	return 0;
 }
 
-
+/*
+* Load the grammar into symbols list
+*/
 void loadGrammar(char const *f_name){
 	if(symbols!=NULL)
 		return;

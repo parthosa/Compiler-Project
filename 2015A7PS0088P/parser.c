@@ -9,13 +9,15 @@
 #include <stdbool.h>
 #include <ctype.h>
 
-#include "symbolDefs.h"
+#include "symbolDef.h"
 
 #include "parser.h"
 #include "lexer.h"
 
 
-
+/*
+* Returns the index number of the symbol present in the SymbolList to be used by parse table 
+*/
 int getIndexNumber(SymbolDef *symbol){
 
 	if(isEpsilon(symbol))
@@ -38,13 +40,15 @@ int getIndexNumber(SymbolDef *symbol){
 
 
 
-
-SymbolList *getFirsts(SymbolList *symbolsLoc){
-	SymbolList * temp3 = symbolsLoc;
+/*
+* Returns the set of firsts for all the symbols in the symList
+*/
+SymbolList *getFirsts(SymbolList *symList){
+	SymbolList * temp3 = symList;
 	SymbolList * firsts = NULL;
 
 	while(temp3!=NULL){
-		if(temp3 == symbolsLoc || allEpsilon(symbolsLoc,temp3))
+		if(temp3 == symList || allEpsilon(symList,temp3))
 			 mergeList(&firsts,temp3->symbol->first,1);
 		temp3=temp3->next;
 	}
@@ -56,7 +60,9 @@ SymbolList *getFirsts(SymbolList *symbolsLoc){
 
 
 
-
+/*
+* Inserts the (symbol,rule no) in all the cells corresponding to the terminals in firsts and symbol 
+*/
 void insertRuleParseTable(SymbolDef *symbol,SymbolList *firsts,int ruleNo){
 	SymbolList * temp3 = firsts;
 	int colIx,rowIx,err=0;
@@ -86,6 +92,10 @@ void insertRuleParseTable(SymbolDef *symbol,SymbolList *firsts,int ruleNo){
 		temp3=temp3->next;
 	}
 }
+
+/*
+* Initialized the parse table
+*/
 void initParseTable(){
 	SymbolList *temp = symbols;
 	int rowIx,colIx;
@@ -109,6 +119,9 @@ void initParseTable(){
 	}
 }
 
+/*
+* Creates the parse table by iterating through the rules and inserting the in cell
+*/
 void createParseTable(){
 	SymbolList *temp = symbols;
 	// int rowIx,colIx;
@@ -129,6 +142,9 @@ void createParseTable(){
 	}
 }
 
+/*
+* Saves the parse table in csv format for the user
+*/
 void saveParseTable(char const *f_name){
 	FILE *fp = fopen(f_name,"w");
 	int rowIx,colIx;
@@ -160,7 +176,7 @@ void createParseTree(FILE *fp){
 	pTree = addChild(pTree,getSymbolIndex(&symbols,MAINFUNCTION));
 	pTreeHead = pTree;
 
-	tokenDesc tokenLex;
+	TokenInfo tokenLex;
 	synchronizationSet = NULL;
 
 	int panicMode = 0,isSyntacticallyCorrect = 1;
@@ -279,7 +295,7 @@ void saveParseTree(FILE *fp){
 		fprintf(fp,"ERROR: Cannot print parse tree before parsing\n");
 		return;
 	}
-	fprintf(fp,"%-20s%-10s%-20s%-30s%-10s%-30s\n","Lexeme","Line","Token","Parent Node","Leaf","Node");
+	fprintf(fp,"%-25s%-10s%-20s%-20s%-30s%-10s%-30s\n","Lexeme","Line","Token","Value If Number","Parent Node","Leaf","Node");
 	printTree(pTreeHead,fp);
 }
 

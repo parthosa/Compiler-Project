@@ -10,7 +10,7 @@
 #include <ctype.h>
 
 
-#include "symbolDefs.h"
+#include "symbolDef.h"
 #include "firstAndFollow.h"
 
 

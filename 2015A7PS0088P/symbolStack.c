@@ -10,7 +10,9 @@
 
 #include "symbolStack.h"
 
-
+/*
+* Make a new stack node
+*/
 SymbolStack *newSymbol(SymbolDef * symbol){
 	SymbolStack *newSym = (SymbolStack*) malloc(sizeof(SymbolStack));
 	newSym->symbol=symbol;

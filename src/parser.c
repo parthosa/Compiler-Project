@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 
-#include "symbolDefs.h"
+#include "symbolDef.h"
 
 #include "parser.h"
 #include "lexer.h"
@@ -160,7 +160,7 @@ void createParseTree(FILE *fp){
 	pTree = addChild(pTree,getSymbolIndex(&symbols,MAINFUNCTION));
 	pTreeHead = pTree;
 
-	tokenDesc tokenLex;
+	TokenInfo tokenLex;
 	synchronizationSet = NULL;
 
 	int panicMode = 0,isSyntacticallyCorrect = 1;
@@ -273,14 +273,14 @@ void createParseTree(FILE *fp){
 }
 
 
-void saveParseTree(FILE *fp){
+void saveParseTree(ParseTree *parseTree,FILE *fp){
 
-	if(pTreeHead==NULL){
+	if(parseTree==NULL){
 		fprintf(fp,"ERROR: Cannot print parse tree before parsing\n");
 		return;
 	}
-	fprintf(fp,"%-20s%-10s%-20s%-30s%-10s%-30s\n","Lexeme","Line","Token","Parent Node","Leaf","Node");
-	printTree(pTreeHead,fp);
+	fprintf(fp,"%-25s%-10s%-20s%-20s%-30s%-10s%-30s\n","Lexeme","Line","Token","Value If Number","Parent Node","Leaf","Node");
+	printTree(parseTree,fp);
 }
 
 // int main(int argc, char const *argv[])

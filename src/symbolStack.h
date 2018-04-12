@@ -7,7 +7,7 @@
 #ifndef SYMBOLSTACK_H_INCLUDED
 #define SYMBOLSTACK_H_INCLUDED
 
-#include "symbolDefs.h"
+#include "symbolDef.h"
 
 typedef struct SymbolStack SymbolStack;
 

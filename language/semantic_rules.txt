@@ -1,0 +1,283 @@
+<mainFunction> ===> MAIN SQO SQC <stmtsAndFunctionDefs> END
+<mainFunction>.addr = make_node(MAINFUNCTION,<stmtsAndFunctionDefs>.addr)
+
+<stmtsAndFunctionDefs> ===> <stmtOrFunctionDef> <stmtsAndFunctionDefsOrEmpty> 
+<stmtsAndFunctionDefs>.addr = <stmtOrFunctionDef>.addr + <stmtsAndFunctionDefsOrEmpty>.addr
+
+<stmtsAndFunctionDefsOrEmpty> ===> <stmtsAndFunctionDefs>
+<stmtsAndFunctionDefsOrEmpty>.addr = <stmtsAndFunctionDefs>.addr
+free(<stmtsAndFunctionDefs>)
+
+<stmtsAndFunctionDefsOrEmpty> ===> _eps_
+<stmtsAndFunctionDefsOrEmpty>.addr = NULL
+
+<stmtOrFunctionDef> ===> <stmt>
+<stmtOrFunctionDef>.addr = <stmt>.addr
+free(<stmt>)
+
+<stmtOrFunctionDef> ===> <functionDef> 
+<stmtOrFunctionDef>.addr = <functionDef>.addr
+free(<functionDef>)
+
+<stmt> ===> <declarationStmt>
+<stmt>.addr = <declarationStmt>.addr
+free(<declarationStmt>)
+
+<stmt> ===> <assignmentStmt>
+<stmt>.addr = <assignmentStmt>.addr
+free(<assignmentStmt>)
+
+<stmt> ===> <conditionalStmt>
+<stmt>.addr = <conditionalStmt>.addr
+free(<conditionalStmt>)
+
+<stmt> ===> <ioStmt>
+<stmt>.addr = <ioStmt>.addr
+free(<ioStmt>)
+
+<stmt> ===> <funcStmt>
+<stmt>.addr = <funcStmt>.addr
+free(<funcStmt>)
+
+<otherStmts> ===> <stmt> <otherStmts>
+<otherStmts>.addr = <stmt>.addr + <otherStmts>.addr
+
+<otherStmts> ===> _eps_
+<otherStmts>.addr = NULL
+
+<funcStmt> ===> <funCall> SEMICOLON 
+<funcStmt>.addr = <funCall>.addr 
+free(<funCall>)
+
+<declarationStmt> ===> <type> <idList> SEMICOLON 
+<declarationStmt>.addr = make_node(DECLARATION,<type>.addr,<idList>.addr)
+
+<assignmentStmt> ===> ID ASSIGNOP <rightHandSideOfId> SEMICOLON
+<assignmentStmt>.addr = make_node(ASSIGNOP,ID.addr,<rightHandSideOfId>.addr)
+
+<assignmentStmt> ===> SQO <idList> SQC ASSIGNOP <rightHandSideOfTuple> SEMICOLON
+<assignmentStmt>.addr = make_node(ASSIGNOPTUPLE,<idList>.addr,<rightHandSideOfTuple>.addr)
+
+<rightHandSideOfId> ===> <arithmeticExpression>
+<rightHandSideOfId>.addr = <arithmeticExpression>.addr
+free(<arithmeticExpression>)
+
+<rightHandSideOfTuple> ===> <funCall>
+<rightHandSideOfTuple>.addr = <funCall>.addr
+free(<funCall>)
+
+<rightHandSideOfTuple> ===> SIZE ID 
+<rightHandSideOfTuple>.addr = make_node(SIZE,ID.addr) 
+
+<conditionalStmt> ===> IF OP <booleanExpression> CL <stmt> <otherStmts> <elseStmt> ENDIF SEMICOLON
+<conditionalStmt>.addr = make_node(IFSTATEMENT,<booleanExpression>.addr,<stmt>.addr + <otherStmts>.addr,<elseStmt>.addr)
+
+<elseStmt> ===> ELSE <stmt> <otherStmts>
+<elseStmt>.addr = <stmt>.addr + <otherStmts>.addr
+
+<elseStmt> ===> _eps_
+<elseStmt>.addr = NULL
+
+<ioStmt> ===> READ OP ID CL SEMICOLON
+<ioStmt>.addr = make_node(IOSTATEMENT,READ,ID.addr)
+
+<ioStmt> ===> PRINT OP ID CL SEMICOLON 
+<ioStmt>.addr = make_node(IOSTATEMENT,PRINT,ID.addr)
+
+<matrix> ===> SQO <numberList> <moreMatrixNums> SQC 
+<matrix>.addr = make_node(MATRIXROW,<numberList>.addr) + <moreMatrixNums>.addr 
+
+<numberList> ===> NUM <moreNums> 
+<numberList>.addr = NUM.addr + <moreNums>.addr
+
+<moreNums> ===> COMMA <numberList>
+<moreNums>.addr = <numberList>.addr
+free(<numberList>)
+
+<moreNums> ===> _eps_
+<moreNums>.addr = NULL
+
+<moreMatrixNums> ===> SEMICOLON <numberList> <moreMatrixNums>
+<moreMatrixNums>.addr = make_node(MATRIXROW,<numberList>.addr) + <moreMatrixNums>.addr
+
+<moreMatrixNums> ===> _eps_
+<moreMatrixNums>.addr = NULL
+
+<arithmeticExpression> ===> <term> <arithmeticExpressionOps>
+<arithmeticExpressionOps>.inh_addr = <term>.addr
+<arithmeticExpression>.addr = <arithmeticExpressionOps>.addr
+free(<term>)
+free(<arithmeticExpressionOps>)
+
+<arithmeticExpressionOps> ===> <plusOrMinus> <arithmeticExpression>
+<arithmeticExpressionOps>.addr = make_node(ARITHMETICEXP1,<plusOrMinus>.addr,<arithmeticExpressionOps>.inh_addr,<arithmeticExpression>.addr)
+
+<arithmeticExpressionOps> ===> _eps_
+<arithmeticExpressionOps>.addr = <arithmeticExpressionOps>.inh_addr
+free(<arithmeticExpressionOps>)
+
+<term> ===> <factor> <termOps>
+<termOps>.inh_addr = <factor>.addr
+<term>.addr = <termOps>.addr
+free(<factor>)
+free(<termOps>)
+
+<termOps> ===> <mulOrDiv> <term>
+<termOps>.addr = make_node(ARITHMETICEXP2,<mulOrDiv>.addr,<termOps>.inh_addr,<term>.addr)
+
+<termOps> ===> _eps_ 
+<termOps>.addr = <termOps>.inh_addr
+free(<termOps>)
+
+<factor> ===> OP <arithmeticExpression> CL
+<factor>.addr = <arithmeticExpression>.addr
+free(<arithmeticExpression>)
+
+<factor> ===> <var>
+<factor>.addr = <var>.addr
+free(<var>)
+
+<plusOrMinus> ===> PLUS
+<plusOrMinus>.addr = PLUS.addr
+
+<plusOrMinus> ===> MINUS
+<plusOrMinus>.addr = MINUS.addr
+
+<mulOrDiv> ===> MUL
+<mulOrDiv>.addr = MUL.addr
+
+<mulOrDiv> ===> DIV
+<mulOrDiv>.addr = DIV.addr
+
+<booleanExpression> ===> OP <booleanExpression> CL <binaryLogicalOp> OP <booleanExpression> CL
+<booleanExpression>.addr = make_node(BOOLEANEXP,<binaryLogicalOp>.addr,<booleanExpression>.addr,<booleanExpression>.addr)
+
+<booleanExpression> ===> NOT OP <booleanExpression> CL
+<booleanExpression>.addr = make_node(BOOLEANEXP,NOT,<booleanExpression>.addr)
+
+<booleanExpression> ===> <constrainedVars1> <relationalOp> <constrainedVars2> 
+<booleanExpression>.addr = make_node(BOOLEANEXP,<relationalOp>.addr,<constrainedVars1>.addr,<constrainedVars2>.addr)
+
+<binaryLogicalOp> ===> AND
+<binaryLogicalOp>.addr = AND.addr
+
+<binaryLogicalOp> ===> OR
+<binaryLogicalOp>.addr = OR.addr
+
+<relationalOp> ===> LT
+<relationalOp>.addr = LT.addr
+
+<relationalOp> ===> LE
+<relationalOp>.addr = LE.addr
+
+<relationalOp> ===> EQ
+<relationalOp>.addr = EQ.addr
+
+<relationalOp> ===> GT
+<relationalOp>.addr = GT.addr
+
+<relationalOp> ===> GE
+<relationalOp>.addr = GE.addr
+
+<relationalOp> ===> NE
+<relationalOp>.addr = NE.addr
+
+<functionDef> ===> FUNCTION SQO <parameterList1> SQC ASSIGNOP FUNID SQO <parameterList> SQC <stmtsAndFunctionDefs> END SEMICOLON
+<functionDef>.addr = make_node(FUNCTIONDEF,<parameterList>.addr,FUNID.addr,<parameterList>.addr,<stmtsAndFunctionDefs>.addr)
+
+
+<parameterList> ===> <type> ID <remainingList>
+<parameterList>.addr = make_node(PARAM,<type>.addr,ID.addr) + <remainingList>.addr
+
+<parameterList> ===> _eps_
+<parameterList>.addr = NULL
+
+<remainingList> ===> COMMA <type> ID <remainingList2>
+<remainingList>.addr = make_node(PARAM,<type>.addr,ID.addr) + <remainingList2>.addr
+
+<remainingList> ===> _eps_
+<remainingList>.addr = NULL
+
+<funCall> ===> FUNID OP <funIdList> CL  
+<funCall>.addr = make_node(FUNCALL,FUNID.addr,<funIdList>.addr)
+
+<funIdList> ===> <varList>
+<funIdList>.addr = <varList>.addr
+free(<varList>)
+
+<funIdList> ===> _eps_
+<funIdList>.addr = NULL
+
+<type> ===> INT
+<type>.addr = INT.addr
+
+<type> ===> REAL
+<type>.addr = REAL.addr
+
+<type> ===> STRING
+<type>.addr = STRING.addr
+
+<type> ===> MATRIX 
+<type>.addr = MATRIX .addr
+
+<var> ===> ID <matrixRest>
+<var>.addr = make_node(MATRIXELE,ID.addr,<matrixRest>.addr)
+
+<var> ===> NUM
+<var>.addr = NUM.addr
+
+<var> ===> RNUM
+<var>.addr = RNUM.addr
+
+<var> ===> SIZE ID 
+<var>.addr = make_node(SIZE,ID.addr)
+
+<var> ===> STR
+<var>.addr = STR.addr
+
+<var> ===> <matrix>
+<var>.addr = <matrix>.addr
+
+<var> ===> <funCall>
+<var>.addr = <funCall>.addr
+free(<funCall>)
+
+<constrainedVars> ===> ID
+<constrainedVars>.addr = ID.addr
+
+<constrainedVars> ===> NUM
+<constrainedVars>.addr = NUM.addr
+
+<constrainedVars> ===> RNUM
+<constrainedVars>.addr = RNUM.addr
+
+<matrixRest> ===> SQO NUM1 COMMA NUM2 SQC
+<matrixRest>.addr = NUM1.addr + NUM2.addr
+
+<matrixRest> ===> _eps_
+<matrixRest>.addr = NULL
+
+<varList> ===> <var> <moreVars>
+<varList>.addr = <var>.addr + <moreVars>.addr
+
+<moreVars> ===> COMMA <varList>
+<moreVars>.addr = <varList>.addr
+free(<varList>)
+
+<moreVars> ===> _eps_
+<moreVars>.addr = NULL
+
+<idList> ===> ID <moreIds> 
+<idList>.addr = ID.addr + <moreIds>.addr
+
+<moreIds> ===> COMMA <idList>
+<moreIds>.addr = <idList>.addr
+free(<idList>)
+
+<moreIds> ===> _eps_
+<moreIds>.addr = NULL
+
+
+Note:
+make_node(): Function to create a new node having its first parameter as label for that node
+free(): Function to free that node

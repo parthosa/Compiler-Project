@@ -14,6 +14,9 @@
 
 typedef struct SymbolDef SymbolDef;
 
+/*
+* Data Structure to store the symbol and its rules list,follow and first list
+*/
 struct SymbolDef{
 	int isTerminal;
 	char value[30];
@@ -25,6 +28,9 @@ struct SymbolDef{
 
 typedef struct RuleList RuleList;
 
+/*
+* Data Structure to store the rule tokens
+*/
 struct RuleList {
 	struct SymbolList * rule_tokens;
 	struct RuleList *next;
@@ -33,6 +39,9 @@ struct RuleList {
 
 typedef struct SymbolList SymbolList;
 
+/*
+* Data Structure to store the symbol list
+*/
 struct SymbolList {
 	SymbolDef * symbol;
 	struct SymbolList *next;
