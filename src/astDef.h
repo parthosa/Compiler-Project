@@ -1,6 +1,9 @@
 #ifndef ASTDEF_H_INCLUDED
 #define ASTDEF_H_INCLUDED
 
+#include "langDef.h"
+#include "parser.h"
+
 #define LABEL_LEN 15
 
 typedef struct ASTNode ASTNode;

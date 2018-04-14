@@ -1,17 +1,28 @@
 _main[ ]
 	string g, h;
 	g = "compiler";
+	matrix mat1;
+	mat1 = [1,2,3,4;2;3];
 	function [string x] = _visibilityDemo[int a, int b]
 		real c;
 		string m1, m2;
 		m2 = "programming";
 		m1 = @m2;
 		function [string s] = _concat[ ]
+			int a;
+			real k;
 			s = m1+m2;
 		end;
 		x = _concat( );
 		c = a/b;
 	end;
 	h = g + _visibilityDemo(2,3);
+	if ((c==d).and.(a=/=b))
+		string g, h;
+		s = "done";
+	else
+		string s;
+		s = "not done";
+	endif;
 	print(h);
 end

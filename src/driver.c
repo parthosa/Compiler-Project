@@ -12,6 +12,7 @@
 #include "firstAndFollow.h"
 #include "parser.h"
 #include "ast.h"
+#include "symbolTable.h"
 
 
 
@@ -141,6 +142,7 @@ int main(int argc, char const *argv[])
         printf("\t3 : For parsing to verify the syntactic correctness of the input source code\n");
         printf("\t4 : For printing the parse tree\n");
         printf("\t5 : For printing the abstract syntax tree\n");
+        printf("\t6 : For printing the symbol table\n");
         printf("\t0 : Exit\n");
         printf("\n\nEnter Value: ");
         char option;
@@ -170,6 +172,9 @@ int main(int argc, char const *argv[])
 				printAST(ASTHead,0);
 				// saveParseTree(ASTHead,fp3);
 				// saveParseTree(ASTHead,stdout);
+				break;
+			case '6':
+				buildSymbolTable(ASTHead,0);
 				break;
 			case '0':
 				printf("\n\nProgram Terminating....\n");

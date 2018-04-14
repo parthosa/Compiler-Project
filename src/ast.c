@@ -73,7 +73,7 @@ ParseTree *getNode(ParseTree *children,char value[30],int nthCount){
 }
 
 ASTNode *buildAST(ParseTree *root){
-    
+
     if(root==NULL)
         return NULL;
 
@@ -221,7 +221,7 @@ ASTNode *buildAST(ParseTree *root){
         ASTNode *otherStmts = buildAST(getNode(root->firstChild,"<otherStmts>",1));
         stmt->sibling = otherStmts;
 
-        ASTNode *elseStmt = newASTNode("ELSESTMT",root->token);
+        ASTNode *elseStmt = newASTNode("ELSESTMTS",root->token);
         elseStmt->firstChild = stmt;
         setParent(elseStmt,stmt);
 

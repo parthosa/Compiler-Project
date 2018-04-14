@@ -9,8 +9,9 @@ debug:clean
 	gcc -Wall -fno-stack-protector src/symbolStack.c -g -c -o out/symbolStack.o 
 	gcc -Wall -fno-stack-protector src/parser.c -g -c -o out/parser.o
 	gcc -Wall -fno-stack-protector src/ast.c -g -c -o out/ast.o
+	gcc -Wall -fno-stack-protector src/symbolTable.c -g -c -o out/symbolTable.o
 	gcc -Wall -fno-stack-protector src/driver.c -g -c -o out/driver.o
-	gcc -Wall -fno-stack-protector -g -o build/pcc out/driver.o out/lexer.o out/symbolDef.o out/firstAndFollow.o out/parser.o out/parserDef.o out/symbolStack.o out/ast.o
+	gcc -Wall -fno-stack-protector -g -o build/pcc out/driver.o out/lexer.o out/symbolDef.o out/firstAndFollow.o out/parser.o out/parserDef.o out/symbolStack.o out/ast.o out/symbolTable.o
 
 firstfollow:clean
 	gcc -Wall -fno-stack-protector src/symbolDef.c -c -o out/symbolDef.o 
